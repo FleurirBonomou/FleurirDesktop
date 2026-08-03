@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerIpcHandlers } from './ipc'
+import { startServer, stopServer } from './server'
 import icon from '../../resources/icon.png?asset'
 
 app.disableHardwareAcceleration()
@@ -41,7 +42,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.fleurir.app')
 
@@ -58,6 +59,11 @@ app.whenReady().then(() => {
   // Fleurir
   registerIpcHandlers()
 
+  // Le serveur Fleurir est lancé avec l'app (ou déjà en cours d'exécution) :
+  // on attend qu'il réponde avant d'ouvrir la fenêtre, pour que les premiers
+  // appels réseau du renderer trouvent l'API.
+  await startServer()
+
   createWindow()
 
   app.on('activate', function () {
@@ -65,6 +71,11 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+// Tue le serveur lancé par l'app quand l'application se ferme.
+app.on('will-quit', () => {
+  stopServer()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
