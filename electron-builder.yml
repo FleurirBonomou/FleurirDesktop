@@ -1,5 +1,5 @@
 appId: com.fleurir.app
-productName: Fleurir
+productName: fleurirdesktop
 directories:
   buildResources: build
 files:
@@ -35,6 +35,8 @@ linux:
     - deb
   maintainer: electronjs.org
   category: Utility
+  syncDesktopName: true
+  icon: build/icons
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false

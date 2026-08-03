@@ -6,7 +6,7 @@
 
 body {
   overflow: hidden;
-  background-image: url('./wavy-lines.svg');
+  background: linear-gradient(135deg, #051c13 0%, #0f3d2e 50%, #4d2c0d 100%);
   background-size: cover;
   user-select: none;
 }
@@ -183,7 +183,7 @@ nav a {
 
 .create-course-button:hover {
   background-color: var(--color-accent-hover);
-  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .create-course-button:active {
