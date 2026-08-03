@@ -1,0 +1,967 @@
+@import './base.css';
+
+/* ==========================================================================
+   Styles globaux
+   ========================================================================== */
+
+body {
+  overflow: hidden;
+  background-image: url('./wavy-lines.svg');
+  background-size: cover;
+  user-select: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+nav a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.shortcut {
+  font-size: 11px;
+  color: var(--ev-c-text-2);
+  opacity: 0.7;
+}
+
+.app-layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Page Cours
+   ========================================================================== */
+
+.courses-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Liste des cours (scroll stylisé) */
+.course-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 12px;
+}
+
+.course-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.course-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.course-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.course-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+/* Champ de recherche de cours */
+.course-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  outline: none;
+}
+
+.course-search:focus {
+  border-color: var(--ev-c-text-1);
+}
+
+/* Carte de cours */
+.course-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  border-color: var(--ev-c-white-soft);
+}
+
+.course-card:focus {
+  outline: 2px solid var(--ev-c-white);
+  outline-offset: -2px;
+  border-color: var(--ev-c-white);
+}
+
+/* Ligne supérieure de la carte (nom + actions) */
+.course-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.course-details {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ev-c-gray-1);
+  font-size: 14px;
+  color: var(--ev-c-text-2);
+}
+
+/* Boutons d'action de la carte (ex. chevron d'ouverture) */
+.course-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.course-actions button {
+  appearance: none;
+  color: var(--ev-c-gray-1);
+  transition: background-color 150ms, color 150ms, transform 150ms;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.course-actions button:hover {
+  color: var(--ev-c-text-1);
+  background-color: var(--ev-c-gray-3);
+  transform: scale(1.2);
+}
+
+.course-actions svg {
+  transition: transform 200ms ease-in-out;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+/* Bouton "Créer un cours" */
+.create-course-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms, box-shadow 150ms, transform 150ms;
+}
+
+.create-course-button:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.4);
+}
+
+.create-course-button:active {
+  transform: scale(0.98);
+}
+
+.create-course-button:focus-visible {
+  outline: 2px solid var(--color-accent-hover);
+  outline-offset: 2px;
+}
+
+/* État vide de la liste */
+.course-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ev-c-text-2);
+}
+
+/* Carte fraîchement créée : petite animation d'entrée */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(6px);
+    animation-timing-function: ease-out;
+  }
+  70% {
+    transform: translateY(-3px);
+    animation-timing-function: ease-in;
+  }
+  85% {
+    transform: translateY(2px);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.new-course-card {
+  border-color: var(--ev-c-white-mute);
+  animation: bounce-in 500ms;
+}
+
+/* Champ d'édition du nom de cours, en ligne dans la carte */
+.new-course-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--ev-c-text-1);
+  font-size: 16px;
+  font-family: inherit;
+  padding: 4px 0;
+}
+
+/* ==========================================================================
+   Page Nouvelle question
+   ========================================================================== */
+
+.new-question-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.new-question-page label {
+  color: var(--ev-c-text-1);
+  font-size: 13px;
+}
+
+/* Champs : base commune */
+.new-question-page input,
+.new-question-page textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-family: inherit;
+  outline: none;
+}
+
+.new-question-page input:focus,
+.new-question-page textarea:focus {
+  border-color: var(--ev-c-text-1);
+}
+
+/* Combobox Cours : le champ input garde la base commune, le wrapper positionne
+   la liste déroulante en absolu sous le champ. */
+.course-combobox {
+  position: relative;
+}
+
+/* Liste déroulante : fond de l'app, ombre portée, même rayon que les champs. */
+.course-listbox {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--ev-c-black-soft);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.course-listbox li {
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--ev-c-text-1);
+}
+
+.course-listbox li:hover,
+.course-listbox li.active {
+  background-color: var(--ev-c-gray-1);
+}
+
+.course-listbox li.selected {
+  background-color: var(--ev-c-white-soft);
+  color: var(--ev-c-black);
+}
+
+.course-listbox::-webkit-scrollbar {
+  width: 8px;
+}
+
+.course-listbox::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.course-listbox::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.course-listbox::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Textarea : redimensionnable, hauteur minimale de 3 lignes */
+.new-question-page textarea {
+  resize: vertical;
+  min-height: 3lh;
+}
+
+.new-question-page textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.new-question-page textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.new-question-page textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.new-question-page textarea::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Section réponse/historique : les deux champs empilés à la verticale, l'un
+   au-dessus de l'autre (le bouton Sauvegarder suit, en bas du formulaire).
+   Chaque champ occupe toute la largeur disponible. */
+.answer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answer-section #history {
+  min-height: 2lh;
+}
+
+/* Wrapper de champ : label + champ + message d'erreur */
+.new-question-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* État d'erreur : bordure rouge + fond rouge très léger (points 1 et 9) */
+.new-question-page .has-error input,
+.new-question-page .has-error textarea {
+  border-color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.08);
+}
+
+/* Message affiché sous le champ fautif (point 2) */
+.field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Sélecteur de type : rangée de boutons */
+.question-types {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  /* Padding + bordure transparente pour que l'état has-error (bordure rouge)
+     n'entraîne aucun décalage de mise en page. */
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+.question-types.has-error {
+  border-color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.08);
+}
+
+.question-types button {
+  flex: 1;
+  padding: 8px 14px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  cursor: pointer;
+}
+
+.question-types button:hover {
+  border-color: var(--ev-c-white-soft);
+}
+
+.question-types button.selected {
+  border-color: var(--ev-c-text-1);
+  background-color: var(--ev-c-white-soft);
+  color: var(--ev-c-black);
+}
+
+/* Vrai/Faux : fond clair permanent */
+.question-types button.primary {
+  border-color: var(--ev-c-white-soft);
+  background-color: var(--ev-c-white-soft);
+  color: var(--ev-c-black);
+}
+
+/* Vrai/Faux non choisi alors qu'un autre type est actif : blanc encore plus doux */
+.question-types button.primary.soft {
+  background-color: var(--ev-c-white-mute);
+  border-color: var(--ev-c-white-mute);
+}
+
+.question-types button.primary.selected {
+  background-color: var(--ev-c-white-mute);
+  border-color: var(--ev-c-white);
+}
+
+/* Animation shake sur le champ fautif (point 3), redéclenchée à chaque
+   soumission échouée grâce à la key React qui remonte le champ. */
+.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+/* Bouton Sauvegarder */
+.create-question-button {
+  align-self: flex-end;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--ev-c-white);
+  color: var(--ev-c-black);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.create-question-button:hover {
+  background-color: var(--ev-c-white-soft);
+}
+
+.create-question-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Feedback global de soumission (succès ou erreur) */
+.submit-feedback {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.submit-feedback.error {
+  color: #ff6b6b;
+}
+
+.submit-feedback.success {
+  color: #6bcf7f;
+}
+
+/* ==========================================================================
+   Page Question
+   ========================================================================== */
+
+.question-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Barre d'en-tête de session : progression du jour vers l'objectif quotidien
+   (barre verte) + score du jour (bonnes réponses / répondues). */
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 14px;
+  background-color: transparent;
+  border: none;
+}
+
+.session-progress {
+  flex: 0 1 320px;
+  height: 8px;
+  background-color: var(--ev-c-gray-1);
+  border: 2px solid #6b7a88;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.session-progress-fill {
+  position: relative;
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* Reflet diagonal balayant la partie verte de gauche à droite, comme une
+   barre d'énergie en train de se remplir. */
+.session-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: session-progress-sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes session-progress-sweep {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.session-score {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ev-c-text-1);
+}
+
+.session-correct {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ev-c-text-2);
+}
+
+.question-message {
+  color: var(--ev-c-text-2);
+}
+
+.question-message.error {
+  color: #ff6b6b;
+}
+
+/* Carte de la question : infos en lignes verticales */
+.question-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 8px;
+  padding: 15px 20px;
+}
+
+.question-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.question-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Bloc de droite : les lignes s'alignent à droite */
+.question-info-column:last-child {
+  align-items: flex-end;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 0;
+}
+
+.info-pair {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.info-label {
+  color: var(--ev-c-text-2);
+  font-size: 12px;
+}
+
+.info-value {
+  color: var(--ev-c-text-1);
+  font-size: 13px;
+}
+
+/* La question elle-même : en évidence, justifiée, très lisible */
+.question-text {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--ev-c-gray-1);
+  font-size: 21px;
+  line-height: 1.7;
+  font-weight: 400;
+  color: var(--ev-c-text-1);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Dernière phrase affichée : texte plus brillant, apparition en fondu */
+.sentence.highlight {
+  color: var(--ev-c-white);
+  animation: sentence-in 400ms ease-out;
+}
+
+@keyframes sentence-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Panneau de réponse : boutons sur la même ligne */
+.answer-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.answer-panel button {
+  flex: none;
+  width: 220px;
+  padding: 12px 14px;
+  border: 1px solid var(--ev-c-white-soft);
+  border-radius: 6px;
+  background-color: var(--ev-c-white-soft);
+  color: var(--ev-c-black);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 300ms ease, border-color 150ms;
+}
+
+.answer-panel button:hover {
+  border-color: var(--ev-c-white);
+}
+
+.answer-panel button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Variante Choix multiples : un bouton par option, empilés verticalement et
+   centrés, dans un ordre aléatoire. */
+.answer-panel.multiple-choice {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Variante Text : entrée de texte (40 caractères) puis bouton "Répondre",
+   empilés verticalement et centrés. */
+.answer-panel.text-answer {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.text-answer-input {
+  padding: 8px 12px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.text-answer-input:focus {
+  border-color: var(--ev-c-text-1);
+}
+
+.text-answer-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Verdict de la réponse : replié sur son contenu (pas toute la largeur),
+   centré horizontalement sous les boutons de réponse. */
+.result-panel {
+  align-self: center;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 8px;
+  background-color: var(--color-background-soft);
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.result-panel p {
+  margin: 0;
+}
+
+.result-expected {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ev-c-text-2);
+}
+
+.result-panel.correct {
+  color: #6bcf7f;
+  border-color: #6bcf7f;
+}
+
+.result-panel.wrong {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+/* Session de question : la carte prend la hauteur de son contenu (elle ne
+   s'étire pas pour remplir la fenêtre) ; la zone de réponse vient juste en
+   dessous de la carte, le verdict encore plus bas. */
+.question-session {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Phrase pas encore révélée : invisible mais occupe sa place, pour que la
+   carte garde la taille qu'elle aura une fois tout affiché */
+.sentence.hidden {
+  visibility: hidden;
+}
+
+/* ==========================================================================
+   Styles du template de démarrage (écran d'accueil / démo)
+   ========================================================================== */
+
+code {
+  font-weight: 600;
+  padding: 3px 5px;
+  border-radius: 2px;
+  background-color: var(--color-background-mute);
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
+  font-size: 85%;
+}
+
+.logo {
+  margin-bottom: 20px;
+  -webkit-user-drag: none;
+  height: 128px;
+  width: 128px;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 1.2em #6988e6aa);
+}
+
+.creator {
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--ev-c-text-2);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.text {
+  font-size: 28px;
+  color: var(--ev-c-text-1);
+  font-weight: 700;
+  line-height: 32px;
+  text-align: center;
+  margin: 0 10px;
+  padding: 16px 0;
+}
+
+.tip {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ev-c-text-2);
+  font-weight: 600;
+}
+
+.react {
+  background: -webkit-linear-gradient(315deg, #087ea4 55%, #7c93ee);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.ts {
+  background: -webkit-linear-gradient(315deg, #3178c6 45%, #f0dc4e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  padding-top: 32px;
+  margin: -6px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.action {
+  flex-shrink: 0;
+  padding: 6px;
+}
+
+.action a {
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid transparent;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 20px;
+  padding: 0 20px;
+  line-height: 38px;
+  font-size: 14px;
+  border-color: var(--ev-button-alt-border);
+  color: var(--ev-button-alt-text);
+  background-color: var(--ev-button-alt-bg);
+}
+
+.action a:hover {
+  border-color: var(--ev-button-alt-hover-border);
+  color: var(--ev-button-alt-hover-text);
+  background-color: var(--ev-button-alt-hover-bg);
+}
+
+.versions {
+  position: absolute;
+  bottom: 30px;
+  margin: 0 auto;
+  padding: 15px 0;
+  font-family: 'Menlo', 'Lucida Console', monospace;
+  display: inline-flex;
+  overflow: hidden;
+  align-items: center;
+  border-radius: 22px;
+  background-color: #202127;
+  backdrop-filter: blur(24px);
+}
+
+.versions li {
+  display: block;
+  float: left;
+  border-right: 1px solid var(--ev-c-gray-1);
+  padding: 0 20px;
+  font-size: 14px;
+  line-height: 14px;
+  opacity: 0.8;
+  &:last-child {
+    border: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .text {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 620px) {
+  .versions {
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  .tip,
+  .actions {
+    display: none;
+  }
+}
