@@ -87,6 +87,9 @@ export function answerQuestion(
 ): Promise<{ id: number; grade: number; askCount: number }> {
   return post<{ id: number; grade: number; askCount: number }>('/question/answer', {
     questionId,
-    correct
+    correct,
+    eventId: crypto.randomUUID(),
+    answeredAt: new Date(),
+    device: 'desktop',
   })
 }
