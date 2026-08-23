@@ -29,7 +29,7 @@ function ResultPanel({ question, selectedAnswer }: ResultPanelProps): React.JSX.
   return (
     <div className={`result-panel ${correct ? 'correct' : 'wrong'}`}>
       <p>{correct ? 'Bonne réponse !' : 'Mauvaise réponse...'}</p>
-      {!correct && <p className="result-expected">Réponse attendue : {expectedLabel}</p>}
+      {!correct && <p className="result-expected" spellCheck={false}>Réponse attendue : {expectedLabel}</p>}
     </div>
   )
 }

@@ -90,7 +90,7 @@ function QuestionCard({
       </div>
 
       {/* Texte de la question, phrase par phrase (révélation pilotée par la page) */}
-      <p className="question-text">
+      <p className="question-text" spellCheck={false}>
         {sentences.map((sentence, index) => (
           <span key={index} className={sentenceClass(index, visible)}>
             {sentence}{' '}
