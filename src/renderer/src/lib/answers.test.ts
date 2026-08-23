@@ -19,4 +19,16 @@ describe('isAnswerCorrect', () => {
     expect(isAnswerCorrect('False', 'false')).toBe(true)
     expect(isAnswerCorrect('True', 'False')).toBe(false)
   })
+
+  it('accepte la réponse anglaise quand la BDD stocke le français', () => {
+    expect(isAnswerCorrect('Faux', 'False')).toBe(true)
+    expect(isAnswerCorrect('Vrai', 'True')).toBe(true)
+    expect(isAnswerCorrect('  Faux ', 'FALSE')).toBe(true)
+  })
+
+  it('refuse toujours le mauvais verdict, quelle que soit la langue', () => {
+    expect(isAnswerCorrect('Faux', 'True')).toBe(false)
+    expect(isAnswerCorrect('Vrai', 'Faux')).toBe(false)
+    expect(isAnswerCorrect('False', 'Vrai')).toBe(false)
+  })
 })
