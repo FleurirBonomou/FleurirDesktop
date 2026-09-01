@@ -1,4 +1,5 @@
 import type { Question as QuestionItem } from '../../../../shared/types'
+import LatexText from '../LatexText'
 
 interface QuestionCardProps {
   question: QuestionItem
@@ -89,12 +90,15 @@ function QuestionCard({
         </div>
       </div>
 
-      {/* Texte de la question, phrase par phrase (révélation pilotée par la page) */}
+      {/* Texte de la question, phrase par phrase (révélation pilotée par la page).
+          Chaque phrase passe par <LatexText> : les segments $..$ / $$..$$ sont
+          rendus en KaTeX, le reste en texte natif. Sans LaTeX, la phrase reste
+          un simple span (classe sentence/highlight/hidden conservée). */}
       <p className="question-text" spellCheck={false}>
         {sentences.map((sentence, index) => (
-          <span key={index} className={sentenceClass(index, visible)}>
-            {sentence}{' '}
-          </span>
+          <LatexText key={index} className={sentenceClass(index, visible)}>
+            {`${sentence} `}
+          </LatexText>
         ))}
       </p>
     </article>

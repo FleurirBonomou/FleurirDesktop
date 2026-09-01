@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Question as QuestionItem } from '../../../../shared/types'
 import { QUESTION_TYPE_LABELS } from '../../../../shared/question-types'
 import { MULTIPLE_CHOICE_SEPARATOR } from '@renderer/lib/answers'
+import LatexText from '../LatexText'
 
 interface AnswerPanelProps {
   question: QuestionItem
@@ -115,7 +116,7 @@ function MultipleChoicePanel({
     <div className="answer-panel multiple-choice">
       {options.map((option) => (
         <button key={option} type="button" disabled={disabled} onClick={() => onAnswer(option)}>
-          {option}
+          <LatexText>{option}</LatexText>
         </button>
       ))}
     </div>

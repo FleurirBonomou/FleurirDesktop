@@ -9,6 +9,7 @@ import {
   QUESTION_TYPES_WITHOUT_ANSWER,
   type QuestionType
 } from '../../../shared/question-types'
+import LatexText from '@renderer/components/LatexText'
 
 // ===========================================================================
 // Constantes
@@ -473,6 +474,12 @@ function NewQuestion(): React.JSX.Element {
             clearError('question')
           }}
         />
+        {question.includes('$') && (
+          <div className="latex-preview">
+            <span className="latex-preview-label">Aperçu :</span>
+            <LatexText className="latex-preview-text">{question}</LatexText>
+          </div>
+        )}
       </FormField>
 
       <FormField id="source" label="Source :" error={errors.source} shakeKey={shakeKey}>

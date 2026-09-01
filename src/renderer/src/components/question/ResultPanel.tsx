@@ -1,6 +1,7 @@
 import type { Question as QuestionItem } from '../../../../shared/types'
 import { QUESTION_TYPE_LABELS } from '../../../../shared/question-types'
-import { isAnswerCorrect, expectedAnswer } from '@renderer/lib/answers'
+import { isAnswerCorrect, expectedAnswer, containsLatex } from '@renderer/lib/answers'
+import LatexText from '../LatexText'
 
 interface ResultPanelProps {
   question: QuestionItem
@@ -18,18 +19,24 @@ function ResultPanel({ question, selectedAnswer }: ResultPanelProps): React.JSX.
     return null
   }
 
-  const correct = isAnswerCorrect(expectedAnswer(question.answer), selectedAnswer)
+  const expected = expectedAnswer(question.answer)
+  const correct = isAnswerCorrect(expected, selectedAnswer, containsLatex(expected, selectedAnswer))
   // Vrai/Faux : libellé du bouton (Vrai/Faux) ; Text/Number : mot attendu ;
   // Choix multiples : la bonne option (la première de question.answer).
   const expectedLabel =
     question.type === 'True' || question.type === 'False'
       ? QUESTION_TYPE_LABELS[question.type]
-      : expectedAnswer(question.answer)
+      : expected
 
   return (
     <div className={`result-panel ${correct ? 'correct' : 'wrong'}`}>
       <p>{correct ? 'Bonne réponse !' : 'Mauvaise réponse...'}</p>
-      {!correct && <p className="result-expected" spellCheck={false}>Réponse attendue : {expectedLabel}</p>}
+      {!correct && (
+        <p className="result-expected" spellCheck={false}>
+          {'Réponse attendue : '}
+          {containsLatex(expectedLabel) ? <LatexText>{expectedLabel}</LatexText> : expectedLabel}
+        </p>
+      )}
     </div>
   )
 }

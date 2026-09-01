@@ -33,7 +33,7 @@ import { useQuestion } from '@renderer/hooks/useQuestion'
 import { useSentenceReveal } from '@renderer/hooks/useSentenceReveal'
 import { useAnswer } from '@renderer/hooks/useAnswer'
 // Verdict local : la bonne réponse dépend du type (Choix multiples : 1re option)
-import { isAnswerCorrect, expectedAnswer } from '@renderer/lib/answers'
+import { isAnswerCorrect, expectedAnswer, containsLatex } from '@renderer/lib/answers'
 // Sous-composants de la session
 import SessionHeader from '@renderer/components/question/SessionHeader'
 import QuestionCard from '@renderer/components/question/QuestionCard'
@@ -91,7 +91,8 @@ function Question(): React.JSX.Element {
     answerQuestion(value)
     if (question !== null) {
       setLastResult({ question, selectedAnswer: value })
-      const correct = isAnswerCorrect(expectedAnswer(question.answer), value)
+      const expected = expectedAnswer(question.answer)
+      const correct = isAnswerCorrect(expected, value, containsLatex(expected, value))
       try {
         await submitAnswer(question.id, correct)
       } catch {

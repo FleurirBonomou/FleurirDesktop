@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isAnswerCorrect } from './answers'
+import { isAnswerCorrect, containsLatex } from './answers'
 
 describe('isAnswerCorrect', () => {
   it('accepte la bonne réponse texte, insensible à la casse et aux espaces', () => {
@@ -30,5 +30,27 @@ describe('isAnswerCorrect', () => {
     expect(isAnswerCorrect('Faux', 'True')).toBe(false)
     expect(isAnswerCorrect('Vrai', 'Faux')).toBe(false)
     expect(isAnswerCorrect('False', 'Vrai')).toBe(false)
+  })
+})
+
+describe('isAnswerCorrect avec LaTeX', () => {
+  it("ignore les espaces d'une formule quand l'option latex est active", () => {
+    expect(isAnswerCorrect('$\\frac{1}{2}$', '$\\frac{1}{2}$', true)).toBe(true)
+    expect(isAnswerCorrect('$\\frac{ 1 }{ 2 }$', '$\\frac{ 1 }{ 2 }$', true)).toBe(true)
+    expect(isAnswerCorrect('$\\frac{ 1 }{ 2 }$', '$\\frac{1}{2}$', true)).toBe(true)
+    expect(isAnswerCorrect('$\\frac{ 1 }{ 3 }$', '$\\frac{1}{2}$', true)).toBe(false)
+  })
+
+  it('refuse une formule où loption latex distingue trop de divergences', () => {
+    expect(isAnswerCorrect('$2x$', '$2 x$', true)).toBe(true)
+    expect(isAnswerCorrect('$2x$', '$3x$', true)).toBe(false)
+  })
+})
+
+describe('containsLatex', () => {
+  it('détecte la présence de délimiteurs $ dans les valeurs', () => {
+    expect(containsLatex('Quelle est la valeur de $\\pi$ ?')).toBe(true)
+    expect(containsLatex('texte simple', 'autre texte')).toBe(false)
+    expect(containsLatex('1961', '$$\\int_0^1 x^2 dx$$')).toBe(true)
   })
 })

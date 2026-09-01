@@ -7,8 +7,13 @@
  * en français ou en anglais. Pour « Choix multiples », seule la première option
  * de question.answer (séparée par « :=: ») est la bonne.
  */
-export function isAnswerCorrect(expectedAnswer: string, answer: string): boolean {
-  return normalize(answer) === normalize(expectedAnswer)
+export function isAnswerCorrect(expectedAnswer: string, answer: string, latex = false): boolean {
+  return normalize(answer, latex) === normalize(expectedAnswer, latex)
+}
+
+/** Détecte des délimiteurs LaTeX ($...$) dans une ou plusieurs chaînes. */
+export function containsLatex(...values: string[]): boolean {
+  return values.some((value) => value.includes('$'))
 }
 
 /** Séparateur des réponses possibles d'une question « Choix multiples »,
@@ -29,8 +34,11 @@ const TRUE_FALSE_ALIASES: Record<string, string> = {
 }
 
 /** Normalise une réponse : on ignore la casse et les espaces autour, et on
- *  ramène Vrai/Faux vers leur forme anglaise. */
-function normalize(value: string): string {
+ *  ramène Vrai/Faux vers leur forme anglaise. Avec latex (contenu LaTeX), tous
+ *  les espaces sont ignorés — sémantique mathématique de TeX où l'espace n'a
+ *  pas de valeur : `$\frac{1}{2}$` = `$\frac{ 1 }{ 2 }$` = `$  \frac { 1 } { 2 } $`. */
+function normalize(value: string, latex = false): string {
   const lowered = value.trim().toLowerCase()
-  return TRUE_FALSE_ALIASES[lowered] ?? lowered
+  const normalized = TRUE_FALSE_ALIASES[lowered] ?? lowered
+  return latex ? normalized.replace(/\s+/g, '') : normalized
 }

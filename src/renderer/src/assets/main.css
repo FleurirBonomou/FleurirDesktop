@@ -146,7 +146,10 @@ nav a {
 .course-actions button {
   appearance: none;
   color: var(--ev-c-gray-1);
-  transition: background-color 150ms, color 150ms, transform 150ms;
+  transition:
+    background-color 150ms,
+    color 150ms,
+    transform 150ms;
   background: none;
   border: none;
   border-radius: 6px;
@@ -178,7 +181,10 @@ nav a {
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 150ms, box-shadow 150ms, transform 150ms;
+  transition:
+    background-color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
 }
 
 .create-course-button:hover {
@@ -364,6 +370,40 @@ nav a {
 
 .new-question-page textarea::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Aperçu LaTeX en direct sous le champ Question (visible dès qu'un « $ » est
+   saisi) : encart discret sur le fond doux, texte rendu à la taille de saisie. */
+.latex-preview {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+}
+
+.latex-preview-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--ev-c-text-2);
+}
+
+.latex-preview-text {
+  font-size: 15px;
+  color: var(--ev-c-text-1);
+  line-height: 1.6;
+}
+
+/* Segment KaTeX inline : aligné sur la ligne de texte environnante. Le
+   display $$..$$ reste un bloc centré, avec des marges réduites. */
+.latex-segment {
+  display: inline-block;
+}
+
+.latex-segment .katex-display {
+  margin: 0.3em 0;
+  text-align: center;
 }
 
 /* Section réponse/historique : les deux champs empilés à la verticale, l'un
@@ -707,7 +747,9 @@ nav a {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 300ms ease, border-color 150ms;
+  transition:
+    opacity 300ms ease,
+    border-color 150ms;
 }
 
 .answer-panel button:hover {

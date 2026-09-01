@@ -1,7 +1,7 @@
 {
   "name": "fleurirdesktop",
   "desktopName": "com.fleurir.app.desktop",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -25,6 +25,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "katex": "^0.18.5",
     "lucide-react": "^1.28.0",
     "react-router-dom": "^7.18.2"
   },
