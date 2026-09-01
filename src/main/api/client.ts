@@ -1,6 +1,16 @@
 import type { Course, NextQuestion, QuestionInput } from '../../shared/types'
 
-const BASE_URL = 'http://localhost:8082'
+const DEFAULT_SERVER_PORT = 8082
+
+/** Port du serveur Fleurir : surchargeable via FLEURIR_SERVER_PORT (même
+ *  mécanisme que server.ts), défaut 8082 pour la prod. */
+function resolveServerPort(): number {
+  const raw = process.env['FLEURIR_SERVER_PORT']
+  const port = raw === undefined ? NaN : Number(raw)
+  return Number.isInteger(port) && port > 0 ? port : DEFAULT_SERVER_PORT
+}
+
+const BASE_URL = `http://localhost:${resolveServerPort()}`
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`)
@@ -90,6 +100,6 @@ export function answerQuestion(
     correct,
     eventId: crypto.randomUUID(),
     answeredAt: new Date(),
-    device: 'desktop',
+    device: 'desktop'
   })
 }

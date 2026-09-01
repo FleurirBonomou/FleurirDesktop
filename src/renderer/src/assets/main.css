@@ -406,6 +406,33 @@ nav a {
   text-align: center;
 }
 
+/* Bloc de code (```lang ... ```) rendu avec Prism. */
+.code-block {
+  margin: 0.5em 0;
+  padding: 0.75em 1em;
+  border-radius: 8px;
+  background-color: var(--ev-c-bg-2, #16181d);
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.code-block code {
+  font-family: inherit;
+  background: transparent;
+}
+
+/* Image dans le contenu (![alt](url)). */
+.content-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5em auto;
+  border-radius: 8px;
+}
+
 /* Section réponse/historique : les deux champs empilés à la verticale, l'un
    au-dessus de l'autre (le bouton Sauvegarder suit, en bas du formulaire).
    Chaque champ occupe toute la largeur disponible. */

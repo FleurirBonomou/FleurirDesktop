@@ -1,11 +1,34 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
+import { join, extname } from 'path'
+import { promises as fs } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerIpcHandlers } from './ipc'
 import { startServer, stopServer } from './server'
 import icon from '../../resources/icon.png?asset'
 
 app.disableHardwareAcceleration()
+
+// Protocole fleuri-file:// : expose des fichiers locaux au renderer (images
+// de contenu). En dev la fenêtre est chargée depuis http://localhost, et
+// Chromium bloque file://  depuis une origine http. Enregistré comme scheme
+// privilégié et servi en lisant le fichier avec fs (jamais de file:// brut).
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'fleuri-file',
+    privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true }
+  }
+])
+
+const MIME_BY_EXT: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml',
+  '.bmp': 'image/bmp',
+  '.avif': 'image/avif'
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -45,6 +68,24 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.fleurir.app')
+
+  // Sert les fichiers locaux via fleuri-file:///path/to/file (lecture seule).
+  protocol.handle('fleuri-file', async (request) => {
+    const raw = new URL(request.url)
+    const decoded = raw.searchParams.get('path') ?? decodeURIComponent(raw.pathname)
+    console.log('[fleuri-file] requête:', request.url, '→ chemin:', decoded)
+    try {
+      const data = await fs.readFile(decoded)
+      const mime = MIME_BY_EXT[extname(decoded).toLowerCase()] ?? 'application/octet-stream'
+      return new Response(data, { headers: { 'Content-Type': mime } })
+    } catch (err) {
+      console.error('[fleuri-file] échec lecture de', decoded, err)
+      return new Response('Not found', {
+        status: 404,
+        headers: { 'x-fleuri-file': 'read-failed' }
+      })
+    }
+  })
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

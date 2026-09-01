@@ -23,4 +23,16 @@ describe('splitSentences with LaTeX', () => {
   it('fonctionne sans LaTeX (pas de régression)', () => {
     expect(splitSentences('Une phrase. Deux phrases!')).toEqual(['Une phrase.', 'Deux phrases!'])
   })
+
+  it('ne coupe pas sur un point dans un bloc de code', () => {
+    expect(splitSentences('Code : ```js\nobj.prop = 1;\n```. Explication.')).toEqual([
+      'Code : ```js\nobj.prop = 1;\n```.',
+      'Explication.'
+    ])
+  })
+
+  it('ne coupe pas sur un point dans une URL d’image', () => {
+    const parts = splitSentences('![ok](https://ex.com/a.b.png) Suite.')
+    expect(parts).toEqual(['![ok](https://ex.com/a.b.png) Suite.'])
+  })
 })
