@@ -1,23 +1,10 @@
-import type { Question as QuestionItem } from '../../../../shared/types'
 import LatexText from '../LatexText'
 
 interface QuestionCardProps {
-  question: QuestionItem
-  /** Nom du cours résolu depuis courseId ; repli sur "Cours <id>" si inconnu. */
-  courseName?: string
   /** Phrases de la question, déjà découpées par la page. */
   sentences: string[]
   /** Nombre de phrases actuellement révélées (1 au minimum). */
   visible: number
-}
-
-/** Date au format français court (jj/mm/aaaa). */
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
 }
 
 /**
@@ -33,67 +20,15 @@ function sentenceClass(index: number, visible: number): string {
 }
 
 /**
- * Carte de question : en-tête avec les petites infos (thème, id, maîtrise,
- * source, dates) puis le texte de la question, révélé phrase par phrase.
+ * Carte de question : à l'image du mobile, elle n'affiche QUE le texte de la
+ * question, révélé phrase par phrase. Les infos (thème, maîtrise, source,
+ * dates…) ne sont plus sur la carte : elles vivent dans le menu Détails du
+ * header. Chaque phrase passe par <LatexText> : les segments $..$ / $$..$$
+ * sont rendus en KaTeX, le reste en texte natif.
  */
-function QuestionCard({
-  question,
-  courseName,
-  sentences,
-  visible
-}: QuestionCardProps): React.JSX.Element {
+function QuestionCard({ sentences, visible }: QuestionCardProps): React.JSX.Element {
   return (
     <article className="question-card">
-      <div className="question-info">
-        {/* Colonne gauche : thème, id + maîtrise, source */}
-        <div className="question-info-column">
-          <p className="info-row">
-            <span className="info-pair">
-              <span className="info-label">Thème</span>
-              <span className="info-value">{courseName ?? `Cours ${question.courseId}`}</span>
-            </span>
-          </p>
-          <p className="info-row">
-            <span className="info-pair">
-              <span className="info-label">Id</span>
-              <span className="info-value">#{question.id}</span>
-            </span>
-            <span className="info-pair">
-              <span className="info-label">Maîtrise</span>
-              <span className="info-value">{question.grade}</span>
-            </span>
-          </p>
-          <p className="info-row">
-            <span className="info-pair">
-              <span className="info-label">Source</span>
-              <span className="info-value">{question.source}</span>
-            </span>
-          </p>
-        </div>
-
-        {/* Colonne droite : dates de création et de dernière pose */}
-        <div className="question-info-column">
-          <p className="info-row">
-            <span className="info-pair">
-              <span className="info-label">Créée le</span>
-              <span className="info-value">{formatDate(question.createdAt)}</span>
-            </span>
-          </p>
-          <p className="info-row">
-            <span className="info-pair">
-              <span className="info-label">Dernière posée</span>
-              <span className="info-value">
-                {question.lastAskedAt ? formatDate(question.lastAskedAt) : 'Jamais'}
-              </span>
-            </span>
-          </p>
-        </div>
-      </div>
-
-      {/* Texte de la question, phrase par phrase (révélation pilotée par la page).
-          Chaque phrase passe par <LatexText> : les segments $..$ / $$..$$ sont
-          rendus en KaTeX, le reste en texte natif. Sans LaTeX, la phrase reste
-          un simple span (classe sentence/highlight/hidden conservée). */}
       <p className="question-text" spellCheck={false}>
         {sentences.map((sentence, index) => (
           <LatexText key={index} className={sentenceClass(index, visible)}>

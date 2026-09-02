@@ -14,6 +14,8 @@ declare global {
         questionId: number,
         correct: boolean
       ) => Promise<{ id: number; grade: number; askCount: number }>
+      updateQuestionFlag: (publicId: string, flagged: boolean) => Promise<{ publicId: string }>
+      deleteQuestion: (publicId: string) => Promise<void>
     }
   }
 }

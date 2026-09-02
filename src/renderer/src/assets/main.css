@@ -6,9 +6,24 @@
 
 body {
   overflow: hidden;
-  background: linear-gradient(135deg, #051c13 0%, #0f3d2e 50%, #4d2c0d 100%);
-  background-size: cover;
+  background: var(--radial-edge);
   user-select: none;
+}
+
+/* Fond radial : lumière verte centrée EN HAUT de l'écran qui s'estompe vers le
+   fond sombre en bas (copié du mobile : RadialBackground). */
+.radial-bg {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(
+    ellipse 90% 70% at 50% -5%,
+    var(--radial-center) 0%,
+    var(--radial-mid) 50%,
+    var(--radial-edge) 100%
+  );
 }
 
 #root {
@@ -40,6 +55,42 @@ nav a {
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* ==========================================================================
+   Page Accueil
+   ========================================================================== */
+
+.home-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-start-btn {
+  background-color: var(--green-40);
+  color: var(--green-95);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.home-start-btn:hover {
+  background-color: var(--green-50);
+}
+
+/* ==========================================================================
+   Page Session (plein écran, sans NavBar)
+   ========================================================================== */
+
+.session-page {
+  padding: 12px 20px;
+  overflow: hidden;
 }
 
 /* ==========================================================================
@@ -270,7 +321,7 @@ nav a {
 
 .new-question-page label {
   color: var(--ev-c-text-1);
-  font-size: 13px;
+  font-size: 20px;
 }
 
 /* Champs : base commune */
@@ -282,6 +333,7 @@ nav a {
   border-radius: 6px;
   background-color: var(--color-background-soft);
   color: var(--ev-c-text-1);
+  font-size: 18px;
   font-family: inherit;
   outline: none;
 }
@@ -583,18 +635,8 @@ nav a {
 }
 
 /* ==========================================================================
-   Page Question
+   Page Question (session plein écran, la classe .session-page est dans la page Accueil)
    ========================================================================== */
-
-.question-page {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 20px;
-}
 
 /* Barre d'en-tête de session : progression du jour vers l'objectif quotidien
    (barre verte) + score du jour (bonnes réponses / répondues). */
@@ -655,17 +697,230 @@ nav a {
 }
 
 .session-score {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ev-c-text-1);
+  display: none;
 }
 
 .session-correct {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  display: none;
+}
+
+/* Boutons d'action du header (Détails, Flag, Modifier, Supprimer) */
+.session-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.session-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
   color: var(--ev-c-text-2);
+  cursor: not-allowed;
+  opacity: 0.5;
+  transition: background-color 150ms;
+}
+
+.session-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Bouton Détails : actif (ouvre le menu) */
+.session-action-btn[title='Détails'] {
+  cursor: pointer;
+  opacity: 1;
+  color: var(--ev-c-text-1);
+}
+
+/* Bouton Flag (Marquer/Démarquer) : actif ; orange quand la question est
+   marquée (même logique que sur le mobile). */
+.session-action-btn[title='Marquer'],
+.session-action-btn[title='Démarquer'] {
+  cursor: pointer;
+  opacity: 1;
+  color: var(--ev-c-text-1);
+}
+
+.session-action-btn.session-action-flagged {
+  color: #ffa726;
+}
+
+.session-action-btn.session-action-flagged:hover {
+  background-color: rgba(255, 167, 38, 0.15);
+}
+
+.session-action-delete {
+  color: #ff6b6b;
+}
+
+/* Bouton Supprimer : actif (ouvre le dialog de confirmation) */
+.session-action-btn[title='Supprimer'] {
+  cursor: pointer;
+  opacity: 1;
+}
+
+/* Menu « Détails » de la question (bouton Info du header) */
+.details-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.details-card {
+  background-color: var(--md-sys-color-surface-variant);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 320px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.details-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.details-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ev-c-text-1);
+}
+
+.details-close {
+  border: none;
+  background: transparent;
+  color: var(--ev-c-text-2);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-label {
+  color: var(--ev-c-text-2);
+  font-size: 14px;
+}
+
+.detail-value {
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+  text-align: right;
+  flex-shrink: 1;
+  word-break: break-word;
+}
+
+.details-done {
+  margin-top: 8px;
+  align-self: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Dialog de confirmation de suppression (bouton Supprimer du header session)
+   ========================================================================== */
+.delete-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 200;
+}
+
+.delete-dialog {
+  background-color: var(--md-sys-color-surface-variant);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.delete-dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b6b;
+}
+
+.delete-dialog-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.delete-dialog-question {
+  margin: 0;
+  color: var(--ev-c-text-1);
+  font-size: 15px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.delete-dialog-hint {
+  margin: 0;
+  color: var(--ev-c-text-2);
+  font-size: 13px;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.delete-dialog-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.delete-cancel {
+  background-color: var(--md-sys-color-surface-container-high, rgba(255, 255, 255, 0.12));
+  color: var(--ev-c-text-1);
+}
+
+.delete-confirm {
+  background-color: #ff6b6b;
+  color: #fff;
 }
 
 .question-message {
@@ -676,63 +931,30 @@ nav a {
   color: #ff6b6b;
 }
 
-/* Carte de la question : infos en lignes verticales */
+/* Carte de la question : uniquement le texte, révélé phrase par phrase */
 .question-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background-color: var(--color-background-soft);
-  border: 1px solid var(--ev-c-gray-1);
+  background-color: transparent;
   border-radius: 8px;
   padding: 15px 20px;
 }
 
-.question-info {
+/* Ligne de badges de la question courante (Nouvelle / Difficulté) */
+.question-toolbar {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
 }
 
-.question-info-column {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Bloc de droite : les lignes s'alignent à droite */
-.question-info-column:last-child {
-  align-items: flex-end;
-}
-
-.info-row {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin: 0;
-}
-
-.info-pair {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.info-label {
-  color: var(--ev-c-text-2);
-  font-size: 12px;
-}
-
-.info-value {
-  color: var(--ev-c-text-1);
-  font-size: 13px;
+.question-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
 }
 
 /* La question elle-même : en évidence, justifiée, très lisible */
 .question-text {
   margin: 0;
-  padding-top: 12px;
-  border-top: 1px solid var(--ev-c-gray-1);
   font-size: 21px;
   line-height: 1.7;
   font-weight: 400;
@@ -756,11 +978,15 @@ nav a {
   }
 }
 
-/* Panneau de réponse : boutons sur la même ligne */
+/* Panneau de réponse : boutons sur la même ligne. margin-top: auto repousse le
+   panneau en bas de l'écran (le conteneur .question-session remplit la page),
+   avec un padding bas pour le détacher du bord. */
 .answer-panel {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  margin-top: auto;
+  padding-bottom: 24px;
 }
 
 .answer-panel button {
@@ -861,6 +1087,181 @@ nav a {
 .result-panel.wrong {
   color: #ff6b6b;
   border-color: #ff6b6b;
+}
+
+/* Écran de transition entre deux questions (remplace la carte après réponse) :
+   période de feedback avant l'avancement. */
+.transition-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.transition-verdict {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.transition-verdict.correct {
+  color: #6bcf7f;
+}
+
+.transition-verdict.wrong {
+  color: #ff6b6b;
+}
+
+.transition-history {
+  color: var(--ev-c-text-2);
+  font-size: 15px;
+  text-align: center;
+}
+
+.transition-hint {
+  color: var(--ev-c-text-2);
+  font-size: 12px;
+  margin-top: 24px;
+}
+
+/* Slide-in/slide-out du TransitionScreen dans une direction aléatoire.
+   Les animations s'appliquent à l'élément racine (.transition-screen) qui
+   occupe tout l'écran : on le décale/ramène depuis un bord de la fenêtre. */
+.transition-screen.slide-in-left {
+  animation: slide-in-left 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.transition-screen.slide-in-right {
+  animation: slide-in-right 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.transition-screen.slide-in-top {
+  animation: slide-in-top 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.transition-screen.slide-in-bottom {
+  animation: slide-in-bottom 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.transition-screen.slide-out-left {
+  animation: slide-out-left 260ms ease-in forwards;
+}
+.transition-screen.slide-out-right {
+  animation: slide-out-right 260ms ease-in forwards;
+}
+.transition-screen.slide-out-top {
+  animation: slide-out-top 260ms ease-in forwards;
+}
+.transition-screen.slide-out-bottom {
+  animation: slide-out-bottom 260ms ease-in forwards;
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slide-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes slide-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Conteneur de carte : structure (stage + wrap) autour du contenu de la
+   question. L'anneau de verdict, lui, se dessine sur les BORDS DE L'ÉCRAN. */
+.question-card-stage {
+  position: relative;
+}
+
+.question-card-wrap {
+  position: relative;
+}
+
+/* Anneau au bord de l'écran, coloré par le verdict de la réponse précédente :
+   position fixed → toujours sur les bords visibles, quel que soit le scroll. */
+.flash-ring {
+  position: fixed;
+  inset: 0;
+  border-width: 4px;
+  border-style: solid;
+  border-radius: 10px;
+  pointer-events: none;
+  animation: flash-ring-fade 700ms ease-out forwards;
+}
+
+.flash-ring.success {
+  border-color: #6bcf7f;
+}
+
+.flash-ring.error {
+  border-color: #ff6b6b;
+}
+
+/* L'anneau apparaît opaque puis fond tout seul (~700 ms), joué à chaque carte. */
+@keyframes flash-ring-fade {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Session de question : la carte prend la hauteur de son contenu (elle ne

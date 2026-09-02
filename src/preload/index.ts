@@ -9,7 +9,10 @@ const api = {
   createQuestion: (input: QuestionInput) => ipcRenderer.invoke('api:createQuestion', input),
   getNextQuestion: (courseId?: number) => ipcRenderer.invoke('api:getNextQuestion', courseId),
   answerQuestion: (questionId: number, correct: boolean) =>
-    ipcRenderer.invoke('api:answerQuestion', questionId, correct)
+    ipcRenderer.invoke('api:answerQuestion', questionId, correct),
+  updateQuestionFlag: (publicId: string, flagged: boolean) =>
+    ipcRenderer.invoke('api:updateQuestionFlag', publicId, flagged),
+  deleteQuestion: (publicId: string) => ipcRenderer.invoke('api:deleteQuestion', publicId)
 }
 
 if (process.contextIsolated) {

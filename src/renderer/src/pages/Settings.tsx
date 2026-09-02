@@ -1,6 +1,6 @@
 function Settings(): React.JSX.Element {
   return (
-    <div>
+    <div className="radial-bg">
       <h1>Settings</h1>
     </div>
   )

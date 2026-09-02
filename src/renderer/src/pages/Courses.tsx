@@ -234,7 +234,7 @@ function Courses(): React.JSX.Element {
 
   // --- 6. Rendu ------------------------------------------------------------------
   return (
-    <div className="courses-page" onKeyDown={handleKeyDown}>
+    <div className="radial-bg courses-page" onKeyDown={handleKeyDown}>
       <input
         ref={searchRef}
         className="course-search"

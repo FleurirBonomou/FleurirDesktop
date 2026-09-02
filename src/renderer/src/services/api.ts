@@ -26,3 +26,14 @@ export function answerQuestion(
 ): Promise<{ id: number; grade: number; askCount: number }> {
   return window.api.answerQuestion(questionId, correct)
 }
+
+export function updateQuestionFlag(
+  publicId: string,
+  flagged: boolean
+): Promise<{ publicId: string }> {
+  return window.api.updateQuestionFlag(publicId, flagged)
+}
+
+export function deleteQuestion(publicId: string): Promise<void> {
+  return window.api.deleteQuestion(publicId)
+}

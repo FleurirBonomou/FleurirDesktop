@@ -89,6 +89,21 @@ export function fetchNextQuestion(courseId?: number): Promise<NextQuestion> {
   return get<NextQuestion>(`/question/next${query}`)
 }
 
+/** Bascule le flag (marquer/démarquer) d'une question, identifiée par son
+ *  publicId (uuid). Le serveur ne met à jour que le champ flagged. */
+export function updateQuestionFlag(
+  publicId: string,
+  flagged: boolean
+): Promise<{ publicId: string }> {
+  return post<{ publicId: string }>('/question/update', { publicId, flagged })
+}
+
+/** Supprime (soft delete) une question, identifiée par son publicId (uuid).
+ *  Le serveur est idempotent (déjà supprimée → ok). */
+export function deleteQuestion(publicId: string): Promise<void> {
+  return post<{ deleted: true }>('/question/delete', { publicId }).then(() => undefined)
+}
+
 /** Enregistre le résultat d'une réponse : le serveur recalcule la grade,
  *  l'historique de pose et le dernier verdict de la question. */
 export function answerQuestion(

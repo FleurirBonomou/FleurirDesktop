@@ -5,7 +5,9 @@ import {
   deleteCourse,
   createQuestion,
   getNextQuestion,
-  answerQuestion
+  answerQuestion,
+  updateQuestionFlag,
+  deleteQuestion
 } from './api'
 import type { QuestionInput } from '../shared/types'
 
@@ -18,4 +20,8 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('api:answerQuestion', (_event, questionId: number, correct: boolean) =>
     answerQuestion(questionId, correct)
   )
+  ipcMain.handle('api:updateQuestionFlag', (_event, publicId: string, flagged: boolean) =>
+    updateQuestionFlag(publicId, flagged)
+  )
+  ipcMain.handle('api:deleteQuestion', (_event, publicId: string) => deleteQuestion(publicId))
 }

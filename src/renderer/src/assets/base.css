@@ -68,6 +68,11 @@
   --md-sys-color-surface-variant: var(--green-30);
   --md-sys-color-on-surface-variant: var(--green-80);
   --md-sys-color-outline: var(--green-60);
+
+  /* Gradient radial de la page session + accueil (copié du mobile) */
+  --radial-center: #12503a;
+  --radial-mid: #081f16;
+  --radial-edge: #0B1711;
 }
 
 /* Rôles sémantiques — schéma clair (mêmes rôles, autres tons) */

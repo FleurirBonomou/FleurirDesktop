@@ -1,0 +1,414 @@
+# Prompt : Système de transition (TransitionScreen) + anneau flash — FleurirDesktop
+
+Date : 02/09/2026
+Projet : FleurirDekstop (Electron + React + react-router-dom v7)
+
+> **OBJECTIF** : Remplacer le `ResultPanel` (panneau de verdict « collé » sous la
+> réponse) par le **système de transition du mobile** : un `TransitionScreen`
+> plein écran qui s'affiche à la place de la carte après une réponse, + l'**anneau
+> vert/rouge** (flash de bordure) sur la carte suivante.
+>
+> **RÉFÉRENCE** :
+> - `FleurirMobile/components/question/TransitionScreen.tsx`
+> - `FleurirMobile/components/question/QuestionCardContainer.tsx` (anneau flash)
+> - `FleurirMobile/app/session.tsx` (comment le flux est piloté)
+> - `FleurirMobile/constants/colors.ts` (`colors.error`, `colors.primary`)
+
+---
+
+## Comportement visé (copié du mobile)
+
+### 1. Avant réponse
+- La carte affiche la question (texte révélé phrase par phrase) + le `AnswerPanel`
+  une fois tout révélé.
+
+### 2. À la réponse
+- La carte **est remplacée** par le `TransitionScreen` (écran plein).
+- Verdict :
+  - **Correcte** → « Bon ! » en **vert**, **avance automatiquement** après ~500 ms.
+  - **Incorrecte** → « Raté... » en **rouge**, affiche le **contexte** (`history`)
+    sous le verdict, et c'est un **clic** qui avance (pas de timer).
+- Indication « Touchez pour continuer » en bas.
+
+### 3. À l'avancement
+- La question suivante est chargée et la carte revient.
+- Un **anneau** (bordure épaisse) **vert** (réponse correcte précédente) ou
+  **rouge** (incorrecte) apparaît sur la carte et **fond par lui-même** (~700 ms).
+
+### 4. Behaviour clé
+- On **ne charge pas** la question suivante immédiatement à la réponse : on attend
+  le tap (erreur) ou le timer (bonne réponse), comme sur le mobile.
+- L'anneau est joué à l'arrivée de chaque **nouvelle** carte, coloré par le verdict
+  de la question **précédente**.
+
+---
+
+## Architecture (adaptation au desktop)
+
+Le desktop utilise une **pile implicite** via `useQuestion` (une seule question
+chargée + `loadNext()`) et gardait `lastResult` pour coller le verdict. On remplace
+ça par un **état de transition explicite** :
+
+```ts
+// Dans Session.tsx
+const [transition, setTransition] = useState<{
+  correct: boolean
+  history: string
+} | null>(null)
+```
+
+- `transition !== null` → on affiche le `TransitionScreen` à la place de la carte.
+- `transition.correct === true` → `autoAdvanceMs = 500` ; sinon pas de timer.
+- Le `onNext` du TransitionScreen → `setTransition(null)` + `loadNext()`.
+- `lastCorrect` (verdict de la question précédente) est conservé pour l'anneau.
+
+---
+
+## Fichiers concernés
+
+| Action | Fichier |
+|--------|---------|
+| Créer | `src/renderer/src/components/question/TransitionScreen.tsx` |
+| Créer | `src/renderer/src/components/question/QuestionCardContainer.tsx` (wrapper animé + anneau) |
+| Modifier | `src/renderer/src/pages/Session.tsx` (état de transition, suppression `lastResult`) |
+| Supprimer | `src/renderer/src/components/question/ResultPanel.tsx` |
+| Modifier | `src/renderer/src/assets/main.css` (styles TransitionScreen + anneau, suppression `.result-*`) |
+| Modifier | `src/renderer/src/pages/Session.test.tsx` (adapter : plus de ResultPanel, tests TransitionScreen/anneau) |
+
+---
+
+## Étape 1 — Créer `TransitionScreen.tsx`
+
+```tsx
+import { useEffect } from 'react'
+import type { ReactNode } from 'react'
+
+/**
+ * Écran plein de transition entre deux questions (copié du mobile). S'affiche à
+ * la place de la carte après une réponse :
+ * - « Bon ! » (vert) si correct, « Raté... » (rouge) sinon ;
+ * - le contexte de la question (question.history) en dessous UNIQUEMENT après
+ *   une erreur, pour lecture ;
+ * - bonne réponse : avance automatiquement après `autoAdvanceMs` ;
+ * - erreur : pas de timer, c'est un clic qui passe à la question suivante.
+ */
+function TransitionScreen({
+  correct,
+  history,
+  autoAdvanceMs,
+  onNext
+}: {
+  correct: boolean
+  history: string
+  autoAdvanceMs?: number
+  onNext: () => void
+}): React.JSX.Element {
+  useEffect(() => {
+    if (autoAdvanceMs === undefined) return
+    const timer = setTimeout(onNext, autoAdvanceMs)
+    return () => clearTimeout(timer)
+  }, [autoAdvanceMs, onNext])
+
+  return (
+    <div className="transition-screen" onClick={onNext}>
+      <p className={`transition-verdict ${correct ? 'correct' : 'wrong'}`}>
+        {correct ? 'Bon !' : 'Raté...'}
+      </p>
+      {!correct && history !== '' && (
+        <p className="transition-history" spellCheck={false}>
+          {history}
+        </p>
+      )}
+      <p className="transition-hint">Touchez pour continuer</p>
+    </div>
+  )
+}
+
+export default TransitionScreen
+```
+
+**Note ReactNode** : si on veut le rendu LaTeX du `history` (comme le mobile via
+`LatexText`), remplacer `<p className="transition-history">` par un `LatexText`.
+Le desktop a déjà `LatexText` : import `from '../LatexText'` et l'utiliser pour le
+contexte (`<LatexText className="transition-history">{history}</LatexText>`).
+`ReactNode` import inutile dans ce cas — à retirer si non utilisé.
+
+---
+
+## Étape 2 — Créer `QuestionCardContainer.tsx` (anneau flash)
+
+Wrapper qui ajoute l'**anneau borderé vert/rouge** au-dessus de la carte, et le
+fait fondre (~700 ms) quand une nouvelle carte arrive.
+
+```tsx
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+
+/**
+ * Conteneur animé de la carte courante : apporte l'anneau (flash de bordure)
+ * vert/rouge au verdict de la question précédente, joué à chaque nouvelle carte.
+ * La couleur suit `flash` ('success' | 'error'), la clé `flashKey` rejoue l'effet.
+ */
+function QuestionCardContainer({
+  children,
+  flash,
+  flashKey
+}: {
+  children: ReactNode
+  flash: 'success' | 'error' | null
+  flashKey: number
+}): React.JSX.Element {
+  const [visible, setVisible] = useState(true)
+  const [fading, setFading] = useState(false)
+
+  // À chaque nouvelle carte (flashKey change) : on repart opaque puis on fond.
+  useEffect(() => {
+    if (flash === null) return
+    setVisible(true)
+    setFading(true)
+    const timer = setTimeout(() => setFading(false), 700)
+    return () => clearTimeout(timer)
+  }, [flash, flashKey])
+
+  const color =
+    flash === 'success' ? 'var(--green-40)' : flash === 'error' ? 'var(--error)' : undefined
+
+  return (
+    <div className="question-card-stage">
+      <div className="question-card-wrap">{children}</div>
+      {flash !== null && (
+        <div
+          className={`flash-ring ${fading ? 'fading' : ''}`}
+          style={{ borderColor: color }}
+          aria-hidden="true"
+        />
+      )}
+    </div>
+  )
+}
+
+export default QuestionCardContainer
+```
+
+**Note CSS de l'anneau** : `--error` n'existe pas — utiliser la couleur d'erreur du
+desktop (`#ff6b6b` ou `var(--md-sys-color-error)`). Voir étape 5.
+
+---
+
+## Étape 3 — Modifier `Session.tsx` (état de transition)
+
+### 3a. Imports
+- Ajouter `import TransitionScreen from '@renderer/components/question/TransitionScreen'`
+- Ajouter `import QuestionCardContainer from '@renderer/components/question/QuestionCardContainer'`
+- **Supprimer** `import ResultPanel ...`.
+
+### 3b. État
+- Remplacer `lastResult` par :
+```ts
+const [transition, setTransition] = useState<{
+  correct: boolean
+  history: string
+} | null>(null)
+const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
+```
+
+### 3c. `handleAnswer`
+```ts
+const handleAnswer = async (value: string): Promise<void> => {
+  answerQuestion(value)
+  if (question !== null) {
+    const expected = expectedAnswer(question.answer)
+    const correct = isAnswerCorrect(expected, value, containsLatex(expected, value))
+    setLastCorrect(correct)
+    // On NE charge PAS la suivante ici : on passe en transition.
+    setTransition({ correct, history: question.history })
+    try {
+      await submitAnswer(question.id, correct)
+    } catch {
+      // La réponse reste enregistrée localement
+    }
+  }
+}
+```
+
+### 3d. `handleNext`
+```ts
+const handleNext = (): void => {
+  setTransition(null)
+  loadNext()
+}
+```
+
+### 3e. Rendu (zone carte)
+- Si `transition !== null` → `TransitionScreen`.
+- Sinon, si question chargée → carte dans `QuestionCardContainer` + AnswerPanel.
+- L'anneau est piloté par `lastCorrect` (verdict de la question précédente), rejoué
+  par `sessionKey` (nouvelle question) :
+
+```tsx
+{question !== null && transition === null && (
+  <div className="question-session">
+    <QuestionToolbar question={question} />
+    <QuestionCardContainer flash={flash} flashKey={sessionKey ?? 0}>
+      <QuestionCard sentences={sentences} visible={visible} />
+    </QuestionCardContainer>
+    {visible >= sentences.length && (
+      <AnswerPanel
+        question={question}
+        sessionKey={sessionKey}
+        disabled={selectedAnswer !== null}
+        onAnswer={handleAnswer}
+        inputRef={inputRef}
+      />
+    )}
+  </div>
+)}
+
+{transition !== null && (
+  <TransitionScreen
+    correct={transition.correct}
+    history={transition.history}
+    autoAdvanceMs={transition.correct ? 500 : undefined}
+    onNext={handleNext}
+  />
+)}
+```
+
+Avec en haut du composant :
+```ts
+const flash: 'success' | 'error' | null =
+  lastCorrect === null ? null : lastCorrect ? 'success' : 'error'
+```
+
+- **Supprimer** le bloc `{lastResult !== null && <ResultPanel ... />}`.
+- **Supprimer** le `detailsOpen` ne change pas (le menu Détails reste).
+
+---
+
+## Étape 4 — Supprimer `ResultPanel.tsx`
+
+- Supprimer `src/renderer/src/components/question/ResultPanel.tsx`.
+- Supprimer toute référence à `lastResult` dans `Session.tsx`.
+
+---
+
+## Étape 5 — CSS `main.css`
+
+### 5a. Supprimer les styles `.result-*` (ancien ResultPanel)
+- `.result-panel`, `.result-panel.correct`, `.result-panel.wrong`,
+  `.result-expected` → **à supprimer** (plus utilisés).
+
+### 5b. TransitionScreen
+```css
+/* Écran de transition entre deux questions (remplace la carte après réponse) */
+.transition-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  cursor: pointer;
+}
+.transition-verdict {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+}
+.transition-verdict.correct {
+  color: var(--progress-fill, #4caf50);
+}
+.transition-verdict.wrong {
+  color: #ff6b6b;
+}
+.transition-history {
+  color: var(--ev-c-text-2);
+  font-size: 15px;
+  text-align: center;
+  margin: 0;
+}
+.transition-hint {
+  color: var(--ev-c-text-2);
+  font-size: 12px;
+  margin-top: 24px;
+}
+```
+
+### 5c. Anneau flash (QuestionCardContainer)
+```css
+/* Conteneur de carte + anneau de verdict (green/rouge) */
+.question-card-stage {
+  position: relative;
+}
+.flash-ring {
+  position: absolute;
+  inset: -2px;
+  border-width: 4px;
+  border-style: solid;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0.95;
+  transition: opacity 700ms ease-out;
+}
+.flash-ring.fading {
+  opacity: 0;
+}
+```
+
+Couleurs : `borderColor` passe par une classe plutôt qu'une couleur inline, pour
+rester propre. Exemple :
+```css
+.flash-ring.success { border-color: var(--green-40); }
+.flash-ring.error { border-color: #ff6b6b; }
+```
+→ dans ce cas, `QuestionCardContainer` rend la classe `flash-ring ${flash}` sans
+`style={{ borderColor }}`.
+
+---
+
+## Étape 6 — Adapter `Session.test.tsx`
+
+Portée des tests à revoir (le flux diffère) :
+
+1. **Supprimer** tout test qui lisait le `ResultPanel` (« Bonne réponse ! » /
+   « Mauvaise réponse... », « Réponse attendue : »).
+2. **Ajouter** : après une réponse correcte, le `TransitionScreen` « Bon ! »
+   apparaît à la place de la carte, et avance (la question suivante est chargée).
+3. **Ajouter** : après une réponse incorrecte, « Raté... » + le `history` s'affichent,
+   et l'avancement se fait par clic.
+4. **Ajouter** : l'anneau flash `flash-ring` a la classe `success` (vert) ou
+   `error` (rouge) selon le verdict précédent.
+5. Conserver les tests de fond radial, compteurs absents, boutons du header,
+   menu Détails, chargement/erreur/vide, badges.
+
+**Note** : pour tester l'avancement, il faut mocker `useQuestion.loadNext` et
+vérifier qu'il est appelé. Le `TransitionScreen` correct auto-avance après 500 ms →
+dans les tests, soit on utilise `vi.useFakeTimers()`, soit on vérifie que
+`loadNext` est appelé après cliquer (cas erreur, plus simple à piloter).
+
+---
+
+## Étape 7 — Vérification
+
+```bash
+cd /home/bonomou/Code/FleurirDekstop
+npm run lint
+npx tsc --noEmit
+npx vitest run
+```
+
+---
+
+## Résumé des fichiers
+
+| Action | Fichier | État |
+|--------|---------|------|
+| Créer | `src/renderer/src/components/question/TransitionScreen.tsx` | ⏳ À FAIRE |
+| Créer | `src/renderer/src/components/question/QuestionCardContainer.tsx` | ⏳ À FAIRE |
+| Modifier | `src/renderer/src/pages/Session.tsx` | ⏳ À FAIRE |
+| Supprimer | `src/renderer/src/components/question/ResultPanel.tsx` | ⏳ À FAIRE |
+| Modifier | `src/renderer/src/assets/main.css` | ⏳ À FAIRE |
+| Modifier | `src/renderer/src/pages/Session.test.tsx` | ⏳ À FAIRE |
+| — | Vérifs (tsc, lint, vitest) | ⏳ À FAIRE |
+| — | Test manuel (`npm run dev`) | ⏳ À FAIRE |

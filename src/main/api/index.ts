@@ -5,6 +5,8 @@ import {
   deleteCourse as requestDeleteCourse,
   createQuestion as requestCreateQuestion,
   fetchNextQuestion,
+  updateQuestionFlag as requestUpdateQuestionFlag,
+  deleteQuestion as requestDeleteQuestion,
   answerQuestion as requestAnswerQuestion
 } from './client'
 
@@ -33,4 +35,15 @@ export function answerQuestion(
   correct: boolean
 ): Promise<{ id: number; grade: number; askCount: number }> {
   return requestAnswerQuestion(questionId, correct)
+}
+
+export function updateQuestionFlag(
+  publicId: string,
+  flagged: boolean
+): Promise<{ publicId: string }> {
+  return requestUpdateQuestionFlag(publicId, flagged)
+}
+
+export function deleteQuestion(publicId: string): Promise<void> {
+  return requestDeleteQuestion(publicId)
 }

@@ -9,6 +9,7 @@ export interface Course {
 
 export interface Question {
   id: number
+  publicId: string
   question: string
   source: string
   answer: string
@@ -21,6 +22,7 @@ export interface Question {
   lastAskedAt: string | null
   askCount: number
   lastCorrect: boolean | null
+  flagged: boolean
 }
 
 export interface QuestionInput {

@@ -448,7 +448,7 @@ function NewQuestion(): React.JSX.Element {
 
   return (
     <form
-      className="new-question-page"
+      className="radial-bg new-question-page"
       ref={formRef}
       onKeyDown={handleKeyDown}
       onSubmit={handleSubmit}
