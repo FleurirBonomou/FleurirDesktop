@@ -388,6 +388,10 @@ describe('Session', () => {
       expect(screen.getByText('Raté...')).toBeTruthy()
       expect(screen.getByText('Je ne savais pas.')).toBeTruthy()
       const loadNext = vi.mocked(useQuestion).mock.results.at(-1)?.value.loadNext
+      // L'écran reste au moins 200 ms avant d'accepter un clic d'avance.
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
       // Clic sur l'écran → slide-out → avancement après 260 ms.
       fireEvent.click(screen.getByText('Raté...'))
       act(() => {
@@ -431,7 +435,7 @@ describe('Session', () => {
     }
   })
 
-  it("affiche l'anneau vert/rouge aux bords de l'écran selon le verdict précédent", () => {
+  it("affiche l'anneau vert/rouge aux bords de l'écran selon le verdict précédent", async () => {
     vi.useFakeTimers()
     try {
       mockSession()
@@ -455,6 +459,7 @@ describe('Session', () => {
       act(() => {
         vi.advanceTimersByTime(260)
       })
+      await act(async () => {})
       const ring = document.querySelector('.flash-ring')
       expect(ring).toBeTruthy()
       expect(ring!.className).toContain('success')
@@ -463,7 +468,7 @@ describe('Session', () => {
     }
   })
 
-  it("affiche l'anneau rouge aux bords de l'écran après une erreur", () => {
+  it("affiche l'anneau rouge aux bords de l'écran après une erreur", async () => {
     vi.useFakeTimers()
     try {
       mockSession()
@@ -475,10 +480,15 @@ describe('Session', () => {
       // Mauvaise réponse (Faux) puis avancement au clic → anneau rouge.
       fireEvent.click(screen.getByRole('button', { name: 'Faux' }))
       expect(screen.getByText('Raté...')).toBeTruthy()
+      // L'écran reste au moins 200 ms avant d'accepter un clic d'avance.
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
       fireEvent.click(screen.getByText('Raté...'))
       act(() => {
         vi.advanceTimersByTime(260)
       })
+      await act(async () => {})
       const ring = document.querySelector('.flash-ring')
       expect(ring).toBeTruthy()
       expect(ring!.className).toContain('error')

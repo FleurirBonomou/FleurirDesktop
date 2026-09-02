@@ -33,7 +33,7 @@ export function useQuestion(): {
   loading: boolean
   error: string
   reload: () => void
-  loadNext: () => void
+  loadNext: () => Promise<void>
   setFlag: () => void
   deleteQuestion: () => void
 } {
@@ -57,9 +57,10 @@ export function useQuestion(): {
 
   // Charge une question. Le loader et l'erreur ne sont touchés que de façon
   // asynchrone (dans .then/.catch) : l'effet de montage qui appelle cette
-  // fonction ne déclenche donc aucun setState synchrone.
-  const loadQuestion = useCallback((): void => {
-    getNextQuestion()
+  // fonction ne déclenche donc aucun setState synchrone. Résout une fois la
+  // nouvelle question reçue (ou en cas d'échec), pour permettre d'enchainer.
+  const loadQuestion = useCallback((): Promise<void> => {
+    return getNextQuestion()
       .then((next) => {
         setQuestion(next.question)
         setStats(next.stats)
@@ -82,12 +83,13 @@ export function useQuestion(): {
   const reload = useCallback((): void => {
     setLoading(true)
     setError('')
-    loadQuestion()
+    void loadQuestion()
   }, [loadQuestion])
 
   // Charge la question suivante, sans écran de chargement (aucun flash).
-  const loadNext = useCallback((): void => {
-    loadQuestion()
+  // Résout une fois la nouvelle question reçue.
+  const loadNext = useCallback((): Promise<void> => {
+    return loadQuestion()
   }, [loadQuestion])
 
   // Bascule le flag de la question courante : mise à jour mémoire immédiate

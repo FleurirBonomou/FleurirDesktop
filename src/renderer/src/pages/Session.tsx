@@ -59,9 +59,13 @@ function Session(): React.JSX.Element {
     }
   }
 
-  const handleNext = (): void => {
+  // Fin de la transition : on charge d'abord la question suivante, PUIS on
+  // retire l'écran de transition. Sans cet ordre, l'ancienne question (et son
+  // panneau de réponse) réapparaîtrait l'espace d'un instant pendant le
+  // chargement réseau (effet de "flash" des boutons en bas de l'écran).
+  const handleNext = async (): Promise<void> => {
+    await loadNext()
     setTransition(null)
-    loadNext()
   }
 
   // Suppression confirmée : on ferme le dialog puis on supprime la question

@@ -28,6 +28,10 @@ function randomDirection(): SlideDirection {
  *   Échap) fait passer à la question suivante (après le slide-out).
  */
 const SLIDE_OUT_MS = 260
+// Durée minimale d'affichage avant qu'une saisie (clic/clavier) puisse déclencher
+// le slide-out. Évite que l'événement qui a validé la réponse ne soit réattrapé
+// ici comme une demande d'avance, ce qui ferait sortir l'écran instantanément.
+const MIN_STAY_MS = 200
 
 function TransitionScreen({
   correct,
@@ -42,6 +46,15 @@ function TransitionScreen({
 }): React.JSX.Element {
   const [direction] = useState(randomDirection)
   const [exiting, setExiting] = useState(false)
+  // vrai seulement après MIN_STAY_MS : tant que faux, les clics/touches sont
+  // ignorés pour l'avance.
+  const [ready, setReady] = useState(false)
+
+  // L'écran reste au moins MIN_STAY_MS avant d'accepter une avance manuelle.
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), MIN_STAY_MS)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Déclenche le slide-out à la fin de l'auto-avance.
   useEffect(() => {
@@ -58,8 +71,8 @@ function TransitionScreen({
   }, [exiting, onNext])
 
   const triggerExit = useCallback(() => {
-    if (!exiting) setExiting(true)
-  }, [exiting])
+    if (ready && !exiting) setExiting(true)
+  }, [ready, exiting])
 
   // Touche du clavier (sauf Échap) → avance à la question suivante.
   useEffect(() => {
