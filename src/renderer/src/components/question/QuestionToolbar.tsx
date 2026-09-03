@@ -11,7 +11,7 @@ import type { Question as QuestionItem } from '../../../../shared/types'
  * Priorité si plusieurs conditions sont vraies : nouvelle > difficile > connue.
  */
 function QuestionToolbar({ question }: { question: QuestionItem }): React.JSX.Element | null {
-  const isNew = question.lastAskedAt === null
+  const isNew = question.lastAskedAt === null && question.grade === 0
   const isHard = question.grade === 0 && question.lastCorrect === false
   const isKnown = question.grade === 3
 
