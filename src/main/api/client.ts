@@ -74,6 +74,10 @@ export function createCourse(name: string): Promise<{ id: number }> {
   return post<{ id: number }>('/course/create', { name })
 }
 
+export function addCourseToList(courseId: number): Promise<void> {
+  return post<void>('/course/addToList', { id: courseId })
+}
+
 export function deleteCourse(id: number): Promise<{ id: number }> {
   return del<{ id: number }>('/course/delete', { id })
 }

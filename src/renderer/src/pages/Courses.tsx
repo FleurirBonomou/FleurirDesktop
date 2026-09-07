@@ -16,7 +16,7 @@
 import CourseCard from '@renderer/components/CourseCard'
 import NewCourseCard from '@renderer/components/NewCourseCard'
 // Appels réseau (le composant ne parle jamais directement au serveur)
-import { getCourses, deleteCourse, createCourse } from '@renderer/services/api'
+import { getCourses, deleteCourse, createCourse, addCourseToList } from '@renderer/services/api'
 // Hooks React
 import { useEffect, useState, useMemo, useRef } from 'react'
 // flushSync force React à commiter le DOM de façon synchrone (utile pour les animations)
@@ -127,6 +127,16 @@ function Courses(): React.JSX.Element {
     } finally {
       setCreating(false)
       searchRef.current?.focus()
+    }
+  }
+
+  const handleAddToList = async (courseId: number): Promise<void> => {
+    try {
+      await addCourseToList(courseId)
+      const updated = await getCourses()
+      setCourses(updated)
+    } catch (error) {
+      console.error('Impossible to add course to list', error)
     }
   }
 
@@ -268,6 +278,8 @@ function Courses(): React.JSX.Element {
               }
               onDelete={() => handleDelete(course.id)}
               onAdd={() => handleAddQuestion(course.id)}
+              onAddToList={() => handleAddToList(course.id)}
+              inList={course.inList}
             />
           ))
         )}

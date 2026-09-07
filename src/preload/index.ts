@@ -10,6 +10,7 @@ const api = {
   getNextQuestion: (courseId?: number) => ipcRenderer.invoke('api:getNextQuestion', courseId),
   answerQuestion: (questionId: number, correct: boolean) =>
     ipcRenderer.invoke('api:answerQuestion', questionId, correct),
+  addCourseToList: (courseId?: number) => ipcRenderer.invoke('api:addCourseToList', courseId),
   updateQuestionFlag: (publicId: string, flagged: boolean) =>
     ipcRenderer.invoke('api:updateQuestionFlag', publicId, flagged),
   deleteQuestion: (publicId: string) => ipcRenderer.invoke('api:deleteQuestion', publicId)

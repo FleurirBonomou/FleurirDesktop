@@ -5,6 +5,7 @@ import {
   deleteCourse,
   createQuestion,
   getNextQuestion,
+  addCourseToList,
   answerQuestion,
   updateQuestionFlag,
   deleteQuestion
@@ -13,6 +14,7 @@ import type { QuestionInput } from '../shared/types'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('api:getCourses', () => getCourses())
+  ipcMain.handle('api:addCourseToList', (_event, courseId: number) => addCourseToList(courseId))
   ipcMain.handle('api:createCourse', (_event, name: string) => createCourse(name))
   ipcMain.handle('api:deleteCourse', (_event, id: number) => deleteCourse(id))
   ipcMain.handle('api:createQuestion', (_event, input: QuestionInput) => createQuestion(input))

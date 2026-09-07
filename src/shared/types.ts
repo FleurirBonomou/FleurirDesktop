@@ -5,6 +5,7 @@ export interface Course {
   name: string
   questionCount: number
   lastQuestionDate: string
+  inList: boolean
 }
 
 export interface Question {

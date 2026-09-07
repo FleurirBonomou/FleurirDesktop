@@ -4,6 +4,10 @@ export function getCourses(): Promise<Course[]> {
   return window.api.getCourses()
 }
 
+export function addCourseToList(courseId: number): Promise<void> {
+  return window.api.addCourseToList(courseId)
+}
+
 export function deleteCourse(id: number): Promise<{ id: number }> {
   return window.api.deleteCourse(id)
 }

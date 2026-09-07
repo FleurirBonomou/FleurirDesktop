@@ -6,6 +6,7 @@ import {
   createQuestion as requestCreateQuestion,
   fetchNextQuestion,
   updateQuestionFlag as requestUpdateQuestionFlag,
+  addCourseToList as requestAddCourseToList,
   deleteQuestion as requestDeleteQuestion,
   answerQuestion as requestAnswerQuestion
 } from './client'
@@ -16,6 +17,10 @@ export function getCourses(): Promise<Course[]> {
 
 export function createCourse(name: string): Promise<{ id: number }> {
   return requestCreateCourse(name)
+}
+
+export function addCourseToList(courseId: number): Promise<void> {
+  return requestAddCourseToList(courseId)
 }
 
 export function deleteCourse(id: number): Promise<{ id: number }> {

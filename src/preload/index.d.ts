@@ -10,6 +10,7 @@ declare global {
       deleteCourse: (id: number) => Promise<{ id: number }>
       createQuestion: (input: QuestionInput) => Promise<{ id: number }>
       getNextQuestion: (courseId?: number) => Promise<NextQuestion>
+      addCourseToList: (courseId?: number) => Promise<void>
       answerQuestion: (
         questionId: number,
         correct: boolean

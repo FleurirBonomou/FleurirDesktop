@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { Plus, Trash2, Pencil, ChevronDown } from 'lucide-react'
+import { Plus, Trash2, Pencil, ChevronDown, Heart } from 'lucide-react'
 
 interface CourseCardProps {
   name: string
   questionCount: number
   lastQuestion: string
+  inList: boolean
   cardRef?: React.Ref<HTMLDivElement>
   onAdd?: () => void
   onDelete?: () => void
+  onAddToList?: () => void
 }
 
 function CourseCard({
@@ -16,7 +18,9 @@ function CourseCard({
   lastQuestion,
   cardRef,
   onAdd,
-  onDelete
+  onDelete,
+  onAddToList,
+  inList
 }: CourseCardProps): React.JSX.Element {
   const [expanded, setExpanded] = useState(false)
 
@@ -25,10 +29,18 @@ function CourseCard({
       <div className="course-top">
         <span className="course-name">{name}</span>
         <div className="course-actions">
-          <button onClick={onAdd}>
+          <button type="button" onClick={onAdd}>
             <Plus size={16} />
           </button>
-          <button>
+          <button
+            type="button"
+            className={inList ? 'course-action-add-to-list' : ''}
+            title={inList ? 'Remove from list' : 'Add to list'}
+            onClick={onAddToList}
+          >
+            <Heart size={16} />
+          </button>
+          <button type="button">
             <Pencil size={16} />
           </button>
           <button
