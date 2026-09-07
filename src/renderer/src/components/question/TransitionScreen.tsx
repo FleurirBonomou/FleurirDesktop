@@ -1,18 +1,19 @@
 import { useEffect, useState, useCallback } from 'react'
 import LatexText from '../LatexText'
 
-const SLIDE_DIRECTIONS = ['left', 'right', 'top', 'bottom'] as const
-type SlideDirection = (typeof SLIDE_DIRECTIONS)[number]
+const ANIMATION = ['left-slide', 'right-slide', 'top-slide', 'bottom-slide', 'fade'] as const
+type Animation = (typeof ANIMATION)[number]
 
-const OPPOSITE: Record<SlideDirection, SlideDirection> = {
-  left: 'right',
-  right: 'left',
-  top: 'bottom',
-  bottom: 'top'
+const OPPOSITE: Record<Animation, Animation> = {
+  'left-slide': 'right-slide',
+  'right-slide': 'left-slide',
+  'top-slide': 'bottom-slide',
+  'bottom-slide': 'top-slide',
+  fade: 'fade'
 }
 
-function randomDirection(): SlideDirection {
-  return SLIDE_DIRECTIONS[Math.floor(Math.random() * SLIDE_DIRECTIONS.length)]
+function randomAnimation(): Animation {
+  return ANIMATION[Math.floor(Math.random() * ANIMATION.length)]
 }
 
 /**
@@ -44,7 +45,7 @@ function TransitionScreen({
   autoAdvanceMs?: number
   onNext: () => void
 }): React.JSX.Element {
-  const [direction] = useState(randomDirection)
+  const [animation] = useState(randomAnimation())
   const [exiting, setExiting] = useState(false)
   // vrai seulement après MIN_STAY_MS : tant que faux, les clics/touches sont
   // ignorés pour l'avance.
@@ -84,8 +85,9 @@ function TransitionScreen({
     return () => window.removeEventListener('keydown', handler)
   }, [correct, triggerExit])
 
-  const slideDir = exiting ? OPPOSITE[direction] : direction
-  const cls = `transition-screen slide-${exiting ? 'out' : 'in'}-${slideDir}`
+  const animationType = exiting ? OPPOSITE[animation] : animation
+  const dir = animationType.replace('-slide', '')
+  const cls = `transition-screen ${dir === 'fade' ? 'fade' : 'slide'}-${exiting ? 'out' : 'in'}${dir === 'fade' ? '' : `-${dir}`}`
 
   return (
     <div className={cls} onClick={triggerExit}>
@@ -95,7 +97,7 @@ function TransitionScreen({
       {!correct && history !== '' && (
         <LatexText className="transition-history">{history}</LatexText>
       )}
-      <p className="transition-hint">Touchez pour continuer</p>
+      {!correct && <p className="transition-hint">Touchez pour continuer</p>}
     </div>
   )
 }
