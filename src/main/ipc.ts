@@ -8,9 +8,11 @@ import {
   addCourseToList,
   answerQuestion,
   updateQuestionFlag,
-  deleteQuestion
+  deleteQuestion,
+  getReviewConfig,
+  updateReviewConfig
 } from './api'
-import type { QuestionInput } from '../shared/types'
+import type { QuestionInput, ReviewConfig } from '../shared/types'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('api:getCourses', () => getCourses())
@@ -19,6 +21,10 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('api:deleteCourse', (_event, id: number) => deleteCourse(id))
   ipcMain.handle('api:createQuestion', (_event, input: QuestionInput) => createQuestion(input))
   ipcMain.handle('api:getNextQuestion', (_event, courseId?: number) => getNextQuestion(courseId))
+  ipcMain.handle('api:getReviewConfig', () => getReviewConfig())
+  ipcMain.handle('api:updateReviewConfig', (_event, patch: Partial<ReviewConfig>) =>
+    updateReviewConfig(patch)
+  )
   ipcMain.handle('api:answerQuestion', (_event, questionId: number, correct: boolean) =>
     answerQuestion(questionId, correct)
   )

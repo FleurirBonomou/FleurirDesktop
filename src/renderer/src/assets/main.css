@@ -1311,6 +1311,116 @@ nav a {
 }
 
 /* ==========================================================================
+   Settings
+   ========================================================================== */
+
+.settings-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-nav {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 2px;
+  gap: 4px;
+}
+
+.settings-nav button {
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 18px;
+  color: var(--ev-c-text-1);
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+
+.settings-nav button:hover {
+  background-color: var(--ev-c-gray-2); 
+  color: var(--ev-c-text-1);
+}
+
+.settings-nav button.active {
+  background-color: var(--md-sys-color-secondary-container);  
+  color: var(--md-sys-color-on-secondary-container); 
+}
+
+.settings-panel {
+  flex: 1;
+  min-width: 0;      /* ← critique */
+  overflow-y: auto;  /* scroll interne du panneau si contenu long */
+  padding: 20px
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.switch-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch-warning {
+  font-size: 12px;
+  color: var(--ev-c-text-2);
+}
+
+.switch-row input[type="checkbox"] {
+  appearance: none;              /* retire la case à cocher native */
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--ev-c-gray-2);        /* piste OFF (grise) */
+  position: relative;
+  flex-shrink: 0;                /* le switch ne rétrécit jamais */
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+/* Le knob = un pseudo-élément */
+.switch-row input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 150ms;
+}
+
+/* ON : piste colorée + knob poussé à droite */
+.switch-row input[type="checkbox"]:checked {
+  background: var(--md-sys-color-primary);
+}
+.switch-row input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+}
+
+/* Disabled + checked (ton cas "muted") : on grise tout */
+.switch-row input[type="checkbox"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Quand le switch est disabled, le label du texte se grise aussi
+   (:has() cible le .switch-row qui contient un input disabled). */
+.switch-row:has(input[type="checkbox"]:disabled) .switch-label,
+.switch-row:has(input[type="checkbox"]:disabled) .switch-warning {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
    Styles du template de démarrage (écran d'accueil / démo)
    ========================================================================== */
 

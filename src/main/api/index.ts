@@ -1,4 +1,4 @@
-import { Course, NextQuestion, QuestionInput } from '../../shared/types'
+import { Course, NextQuestion, QuestionInput, ReviewConfig } from '../../shared/types'
 import {
   fetchCourses,
   createCourse as requestCreateCourse,
@@ -8,7 +8,9 @@ import {
   updateQuestionFlag as requestUpdateQuestionFlag,
   addCourseToList as requestAddCourseToList,
   deleteQuestion as requestDeleteQuestion,
-  answerQuestion as requestAnswerQuestion
+  answerQuestion as requestAnswerQuestion,
+  fetchReviewConfig,
+  updateReviewConfig as requestUpdateReviewConfig
 } from './client'
 
 export function getCourses(): Promise<Course[]> {
@@ -25,6 +27,14 @@ export function addCourseToList(courseId: number): Promise<void> {
 
 export function deleteCourse(id: number): Promise<{ id: number }> {
   return requestDeleteCourse(id)
+}
+
+export function getReviewConfig(): Promise<ReviewConfig> {
+  return fetchReviewConfig()
+}
+
+export function updateReviewConfig(patch: Partial<ReviewConfig>): Promise<ReviewConfig> {
+  return requestUpdateReviewConfig(patch)
 }
 
 export function createQuestion(input: QuestionInput): Promise<{ id: number }> {

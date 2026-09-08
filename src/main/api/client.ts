@@ -1,4 +1,4 @@
-import type { Course, NextQuestion, QuestionInput } from '../../shared/types'
+import type { Course, NextQuestion, QuestionInput, ReviewConfig } from '../../shared/types'
 
 const DEFAULT_SERVER_PORT = 8082
 
@@ -47,6 +47,25 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
   return body.data
 }
 
+async function patch<T>(path: string, payload: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: payload })
+  })
+
+  if (!res.ok) {
+    throw new Error(`PATCH ${path} failed: ${res.status}`)
+  }
+  const body = await res.json()
+
+  if (!body.ok) {
+    throw new Error(`Server error: ${body.message}`)
+  }
+
+  return body.data
+}
+
 async function del<T>(path: string, payload: unknown): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: 'DELETE',
@@ -80,6 +99,15 @@ export function addCourseToList(courseId: number): Promise<void> {
 
 export function deleteCourse(id: number): Promise<{ id: number }> {
   return del<{ id: number }>('/course/delete', { id })
+}
+
+export function fetchReviewConfig(): Promise<ReviewConfig> {
+  return get<ReviewConfig>('/review/config')
+}
+
+/** Merge-patch partiel : seuls les champs présents sont appliqués (RFC 7396). */
+export function updateReviewConfig(configPatch: Partial<ReviewConfig>): Promise<ReviewConfig> {
+  return patch<ReviewConfig>('/review/config', configPatch)
 }
 
 export function createQuestion(input: QuestionInput): Promise<{ id: number }> {

@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { Course, NextQuestion, QuestionInput } from '../shared/types'
+import type { Course, NextQuestion, QuestionInput, ReviewConfig } from '../shared/types'
 
 declare global {
   interface Window {
@@ -10,6 +10,8 @@ declare global {
       deleteCourse: (id: number) => Promise<{ id: number }>
       createQuestion: (input: QuestionInput) => Promise<{ id: number }>
       getNextQuestion: (courseId?: number) => Promise<NextQuestion>
+      getReviewConfig: () => Promise<ReviewConfig>
+      updateReviewConfig: (patch: Partial<ReviewConfig>) => Promise<ReviewConfig>
       addCourseToList: (courseId?: number) => Promise<void>
       answerQuestion: (
         questionId: number,

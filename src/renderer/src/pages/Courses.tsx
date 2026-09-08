@@ -16,7 +16,14 @@
 import CourseCard from '@renderer/components/CourseCard'
 import NewCourseCard from '@renderer/components/NewCourseCard'
 // Appels réseau (le composant ne parle jamais directement au serveur)
-import { getCourses, deleteCourse, createCourse, addCourseToList } from '@renderer/services/api'
+import {
+  getCourses,
+  deleteCourse,
+  createCourse,
+  addCourseToList,
+  getReviewConfig,
+  updateReviewConfig
+} from '@renderer/services/api'
 // Hooks React
 import { useEffect, useState, useMemo, useRef } from 'react'
 // flushSync force React à commiter le DOM de façon synchrone (utile pour les animations)
@@ -132,9 +139,16 @@ function Courses(): React.JSX.Element {
 
   const handleAddToList = async (courseId: number): Promise<void> => {
     try {
+      const wasInList = courses.find((course) => course.id === courseId)?.inList ?? false
       await addCourseToList(courseId)
       const updated = await getCourses()
       setCourses(updated)
+      // Si on vient de décocher le dernier cours de la liste alors qu'on filtrait
+      // par liste, on désactive le filtre pour ne pas rester bloqué sur vide.
+      if (wasInList && !updated.some((course) => course.inList)) {
+        const config = await getReviewConfig()
+        if (config.useList) await updateReviewConfig({ useList: false })
+      }
     } catch (error) {
       console.error('Impossible to add course to list', error)
     }

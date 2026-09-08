@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { QuestionInput } from '../shared/types'
+import type { QuestionInput, ReviewConfig } from '../shared/types'
 
 const api = {
   getCourses: () => ipcRenderer.invoke('api:getCourses'),
@@ -8,6 +8,9 @@ const api = {
   deleteCourse: (id: number) => ipcRenderer.invoke('api:deleteCourse', id),
   createQuestion: (input: QuestionInput) => ipcRenderer.invoke('api:createQuestion', input),
   getNextQuestion: (courseId?: number) => ipcRenderer.invoke('api:getNextQuestion', courseId),
+  getReviewConfig: () => ipcRenderer.invoke('api:getReviewConfig'),
+  updateReviewConfig: (patch: Partial<ReviewConfig>) =>
+    ipcRenderer.invoke('api:updateReviewConfig', patch),
   answerQuestion: (questionId: number, correct: boolean) =>
     ipcRenderer.invoke('api:answerQuestion', questionId, correct),
   addCourseToList: (courseId?: number) => ipcRenderer.invoke('api:addCourseToList', courseId),

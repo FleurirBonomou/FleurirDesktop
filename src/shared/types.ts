@@ -48,3 +48,19 @@ export interface NextQuestion {
   question: Question | null
   stats: QuestionStats
 }
+
+/** Réglages du tirage de questions (review_config côté serveur). */
+export interface ReviewConfig {
+  neverAskedAgeDays: number
+  recencyUnitHours: number
+  failureBonus: number
+  weightGrade0: number
+  weightGrade1: number
+  weightGrade2: number
+  weightGrade3: number
+  wrongResetGrade: number
+  maxGrade: number
+  dailyQuestionGoal: number
+  /** Si true, le tirage n'utilise que les questions des cours marqués inList. */
+  useList: boolean
+}

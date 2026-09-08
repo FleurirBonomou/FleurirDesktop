@@ -1,7 +1,15 @@
-import type { Course, NextQuestion, QuestionInput } from '../../../shared/types'
+import type { Course, NextQuestion, QuestionInput, ReviewConfig } from '../../../shared/types'
 
 export function getCourses(): Promise<Course[]> {
   return window.api.getCourses()
+}
+
+export function getReviewConfig(): Promise<ReviewConfig> {
+  return window.api.getReviewConfig()
+}
+
+export function updateReviewConfig(patch: Partial<ReviewConfig>): Promise<ReviewConfig> {
+  return window.api.updateReviewConfig(patch)
 }
 
 export function addCourseToList(courseId: number): Promise<void> {
