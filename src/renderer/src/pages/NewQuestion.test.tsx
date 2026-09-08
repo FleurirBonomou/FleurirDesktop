@@ -10,7 +10,7 @@ vi.mock('@renderer/services/api', () => ({
   createQuestion: vi.fn().mockResolvedValue({ id: 1 })
 }))
 
-const COURSES = [{ id: 1, name: 'Math', questionCount: 0, lastQuestionDate: '' }]
+const COURSES = [{ id: 1, name: 'Math', questionCount: 0, lastQuestionDate: '', inList: false }]
 
 describe('NewQuestion', () => {
   beforeEach(() => {
