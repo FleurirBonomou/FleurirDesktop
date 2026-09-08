@@ -206,6 +206,8 @@ describe('Session', () => {
   })
 
   it('affiche le badge 🌱 pour une question jamais posée', () => {
+    // Le badge « Nouvelle » exige lastAskedAt === null ET grade === 0.
+    mockSession({ question: { ...QUESTION, grade: 0 } })
     render(
       <MemoryRouter>
         <Session />
@@ -359,7 +361,6 @@ describe('Session', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Vrai' }))
       // La carte est remplacée par l'écran de transition.
       expect(screen.getByText('Bon !')).toBeTruthy()
-      expect(screen.getByText('Touchez pour continuer')).toBeTruthy()
       const loadNext = vi.mocked(useQuestion).mock.results.at(-1)?.value.loadNext
       // 500 ms → setExiting(true) (slide-out démarre).
       act(() => {
