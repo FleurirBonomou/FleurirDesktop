@@ -1,14 +1,32 @@
+import type { QuestionType } from '../../../../shared/question-types'
+
 /**
  * Teste si une réponse donnée est la bonne pour une question.
  *
- * La réponse attendue est question.answer : 'True'/'False' (ou 'Vrai'/'Faux')
- * pour Vrai/Faux, le mot à taper pour les questions Text/Number. La comparaison
- * ignore la casse et les espaces autour du mot, et accepte Vrai/Faux indifféremment
- * en français ou en anglais. Pour « Choix multiples », seule la première option
- * de question.answer (séparée par « :=: ») est la bonne.
+ * Pour Vrai/Faux, la bonne réponse est portée par le TYPE de la question
+ * ('True'/'False'), pas par question.answer. Pour les autres types, la réponse
+ * attendue est question.answer : le mot à taper pour Text/Number (toute option
+ * séparée par « :=: » est acceptée), la première option pour « Choix multiples ».
+ * La comparaison ignore la casse et les espaces autour du mot, et accepte
+ * Vrai/Faux indifféremment en français ou en anglais.
  */
-export function isAnswerCorrect(expectedAnswer: string, answer: string, latex = false): boolean {
-  return normalize(answer, latex) === normalize(expectedAnswer, latex)
+export function isAnswerCorrect(
+  questionAnswer: string,
+  answer: string,
+  type: QuestionType
+): boolean {
+  const alternatives = questionAnswer.split(MULTIPLE_CHOICE_SEPARATOR)
+  const hasLatex = questionAnswer.includes('$') || answer.includes('$')
+
+  if (type === 'True' || type === 'False') {
+    return normalize(answer, hasLatex) === normalize(type, hasLatex)
+  }
+
+  if (type === 'Multiple choice') {
+    return normalize(answer, hasLatex) === normalize(alternatives[0] ?? questionAnswer, hasLatex)
+  }
+
+  return alternatives.some((alt) => normalize(answer, hasLatex) === normalize(alt, hasLatex))
 }
 
 /** Détecte des délimiteurs LaTeX ($...$) dans une ou plusieurs chaînes. */

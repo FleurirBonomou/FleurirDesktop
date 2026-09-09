@@ -5,7 +5,7 @@ import { getCourses, answerQuestion as submitAnswer } from '@renderer/services/a
 import { useQuestion } from '@renderer/hooks/useQuestion'
 import { useSentenceReveal } from '@renderer/hooks/useSentenceReveal'
 import { useAnswer } from '@renderer/hooks/useAnswer'
-import { isAnswerCorrect, expectedAnswer, containsLatex } from '@renderer/lib/answers'
+import { isAnswerCorrect } from '@renderer/lib/answers'
 import SessionHeader from '@renderer/components/question/SessionHeader'
 import QuestionToolbar from '@renderer/components/question/QuestionToolbar'
 import QuestionCard from '@renderer/components/question/QuestionCard'
@@ -46,8 +46,7 @@ function Session(): React.JSX.Element {
   const handleAnswer = async (value: string): Promise<void> => {
     answerQuestion(value)
     if (question !== null) {
-      const expected = expectedAnswer(question.answer)
-      const correct = isAnswerCorrect(expected, value, containsLatex(expected, value))
+      const correct = isAnswerCorrect(question.answer, value, question.type)
       setLastCorrect(correct)
       // On NE charge pas la suivante ici : on passe d'abord en transition (tap/timer).
       setTransition({ correct, history: question.history })
