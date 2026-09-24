@@ -3,14 +3,16 @@ export type LatexSegment =
   | { type: 'latex-inline'; content: string }
   | { type: 'latex-block'; content: string }
   | { type: 'code'; content: string; language?: string }
+  | { type: 'code-inline'; content: string }
   | { type: 'image'; content: string; alt?: string }
 
 const RICH_REGEX =
-  /(```[\s\S]+?```|\$\$[\s\S]+?\$\$|!\[[^\]]*\]\([^)\s]+(?:["'][^"']*["'])?\)|\$(?!\$)(?:[^$\\]|\\.)+?\$)/g
+  /(```[\s\S]+?```|`[^`]+`|\$\$[\s\S]+?\$\$|!\[[^\]]*\]\([^)\s]+(?:["'][^"']*["'])?\)|\$(?!\$)(?:[^$\\]|\\.)+?\$)/g
 
 /**
  * Découpe une string en segments. Délimiteurs supportés :
  * - ```lang\ncode\n``` → code (bloc de code)
+ * - `code` → code-inline (monospace dans la phrase)
  * - $$...$$ → latex-block
  * - ![alt](url) → image
  * - $...$ → latex-inline
@@ -41,6 +43,9 @@ export function parseLatexSegments(text: string): LatexSegment[] {
 function classify(raw: string): LatexSegment {
   if (raw.startsWith('```')) {
     return classifyCode(raw)
+  }
+  if (raw.startsWith('`')) {
+    return { type: 'code-inline', content: raw.slice(1, -1).trim() }
   }
   if (raw.startsWith('$$')) {
     return { type: 'latex-block', content: raw.slice(2, -2).trim() }

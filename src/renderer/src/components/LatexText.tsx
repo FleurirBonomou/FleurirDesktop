@@ -75,6 +75,8 @@ function RichSegmentNode({ segment }: { segment: LatexSegment }): React.JSX.Elem
           />
         </pre>
       )
+    case 'code-inline':
+      return <code className="code-inline">{segment.content}</code>
     case 'image':
       return (
         <img

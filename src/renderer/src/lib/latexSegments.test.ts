@@ -25,6 +25,30 @@ describe('parseLatexSegments code', () => {
   })
 })
 
+describe('parseLatexSegments code inline', () => {
+  it('parse du code en ligne au milieu d’une phrase', () => {
+    expect(parseLatexSegments('utilise `git commit` maintenant')).toEqual([
+      { type: 'text', content: 'utilise ' },
+      { type: 'code-inline', content: 'git commit' },
+      { type: 'text', content: ' maintenant' }
+    ])
+  })
+
+  it('un $ dans du code inline n’est pas du LaTeX', () => {
+    expect(parseLatexSegments('Écris `"$x"` ici')).toEqual([
+      { type: 'text', content: 'Écris ' },
+      { type: 'code-inline', content: '"$x"' },
+      { type: 'text', content: ' ici' }
+    ])
+  })
+
+  it('les blocs ``` restent prioritaires (pas mangés par les backticks seuls)', () => {
+    expect(parseLatexSegments('```js\nconst a = 1;\n```')).toEqual([
+      { type: 'code', content: 'const a = 1;', language: 'js' }
+    ])
+  })
+})
+
 describe('parseLatexSegments image', () => {
   it('parse une image avec alt et url', () => {
     expect(parseLatexSegments('Voir ![schéma](https://ex.com/a.png) là.')).toEqual([
