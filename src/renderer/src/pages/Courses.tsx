@@ -299,7 +299,7 @@ function Courses(): React.JSX.Element {
         )}
       </div>
 
-      <button ref={buttonRef} className="create-course-button" onClick={startCreate}>
+      <button ref={buttonRef} className="btn btn--filled course-create-btn" onClick={startCreate}>
         Nouveau cours
       </button>
     </div>

@@ -49,10 +49,10 @@ function DeleteConfirmModal({
         </p>
 
         <div className="delete-dialog-actions">
-          <button type="button" className="delete-dialog-btn delete-cancel" onClick={onCancel}>
+          <button className="btn btn--filled delete-cancel" onClick={onCancel}>
             Annuler
           </button>
-          <button type="button" className="delete-dialog-btn delete-confirm" onClick={onConfirm}>
+          <button className="btn btn--danger delete-confirm" onClick={onConfirm}>
             Supprimer
           </button>
         </div>

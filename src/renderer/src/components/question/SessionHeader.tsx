@@ -38,24 +38,29 @@ function SessionHeader({
         />
       </div>
       <div className="session-actions">
-        <button type="button" className="session-action-btn" title="Détails" onClick={onDetails}>
+        <button
+          type="button"
+          className="btn btn--icon btn--text"
+          title="Détails"
+          onClick={onDetails}
+        >
           <Info size={18} />
         </button>
         <button
           type="button"
-          className={`session-action-btn${flagged ? ' session-action-flagged' : ''}`}
+          className={`btn btn--icon btn--text${flagged ? ' session-action-flagged' : ''}`}
           title={flagged ? 'Démarquer' : 'Marquer'}
           aria-pressed={flagged}
           onClick={onFlag}
         >
           <Flag size={18} fill={flagged ? 'currentColor' : 'none'} />
         </button>
-        <button type="button" className="session-action-btn" title="Modifier" disabled>
+        <button type="button" className="btn btn--icon btn--text" title="Modifier" disabled>
           <Pencil size={18} />
         </button>
         <button
           type="button"
-          className="session-action-btn session-action-delete"
+          className="btn btn--icon btn--text session-action-delete"
           title="Supprimer"
           onClick={onDelete}
         >

@@ -29,11 +29,10 @@ function CourseCard({
       <div className="course-top">
         <span className="course-name">{name}</span>
         <div className="course-actions">
-          <button type="button" onClick={onAdd}>
+          <button className="btn btn--icon btn--text" onClick={onAdd}>
             <Plus size={16} />
           </button>
           <button
-            type="button"
             className={inList ? 'course-action-add-to-list' : ''}
             title={inList ? 'Remove from list' : 'Add to list'}
             onClick={onAddToList}

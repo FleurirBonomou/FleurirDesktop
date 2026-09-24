@@ -69,6 +69,18 @@
   --md-sys-color-on-surface-variant: var(--green-80);
   --md-sys-color-outline: var(--green-60);
 
+  /* Couleurs d'actions */
+  --color-danger: #ff6b6b;
+  --color-danger-soft: rgba(255, 107, 107, 0.08);
+  --color-success: #6bcf7f;
+  --color-marked: #ffa726;
+  --color-marked-soft: rgba(255, 167, 38, 0.15);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+
+  /* Texte sur background */
+  --text-bg: var(--green-95);
+  --text-bg-strong: var(--orange-50);
+
   /* Gradient radial de la page session + accueil (copié du mobile) */
   --radial-center: #12503a;
   --radial-mid: #081f16;
@@ -98,8 +110,144 @@
   --md-sys-color-surface-variant: var(--green-90);
   --md-sys-color-on-surface-variant: var(--green-30);
   --md-sys-color-outline: var(--green-50);
+
+  /* Couleurs d'actions */
+  --color-danger: #b3261e;
+  --color-danger-soft: rgba(179, 38, 30, 0.12);
+  --color-success: #2e7d32;
+  --color-marked: #e65100;
+  --color-marked-soft: rgba(230, 81, 0, 0.08);
+  --surface-hover: rgba(0, 0, 0, 0.08);
+
+  /* Texte sur background */
+  --text-bg: var(--green-10);
+  --text-bg-strong: var(--green-0)
+
 }
 
+/* ==========================================================================
+   Ombres
+   ========================================================================== */
+
+:root {
+  --shadow-sm: rgba(0, 0, 0, 0.3); /* ombre légère */
+  --shadow-lg: rgba(0, 0, 0, 0.4); /* ombre forte */
+  --overlay-scrim: rgba(0, 0, 0, 0.5); /* overlay sombre */
+  --overlay-scrim-heavy: rgba(0, 0, 0, 0.6); /* overlay très sombre */
+}
+
+/* ==========================================================================
+   Formes
+   ========================================================================== */
+
+:root {
+  --radius-sm: 6px; /* petits éléments, boutons, champs */
+  --radius-md: 8px; /* cartes */
+}
+
+/* ==========================================================================
+   Typographie
+   ========================================================================== */
+
+:root {
+  --font-size-sm: 12px; /* petits textes, labels */
+  --font-size-base: 14px; /* corps de textes */
+  --font-size-md: 16px; /* sous-titres */
+  --font-size-lg: 18px; /* titres */
+  --font-size-question: 24px; /* question principale */
+  --font-size-only: 40px; /* seul texte sur la page */
+}
+
+/* ==========================================================================
+   Espacements
+   ========================================================================== */
+  
+:root {
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+}
+
+/* ==========================================================================
+   Bouttons
+   ========================================================================== */
+  
+.btn { 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* Filled button - action principal (fond coloré) */
+
+.btn--filled {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.btn--filled:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
+}
+
+/* Outlined - action secondaire */
+
+.btn--outlined {
+  background-color: transparent;
+  border-color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-primary);
+}
+
+.btn--outlined:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Text - action discrète */
+
+.btn--text {
+  background-color: transparent;
+  color: var(--text-bg);
+}
+
+.btn--text:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Danger - action destructrice */
+
+.btn--danger {
+  background-color: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+}
+
+.btn--danger:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-error), var(--md-sys-color-on-error) 8%);
+}
+
+.btn--icon {
+  width: 32px;
+  height: 32px;
+  padding: 0; /* écrase le padding de .btn */
+}
+
+.btn--icon:hover {
+  transform: none;
+}
+   
 /* ==========================================================================
    Ancien système conservé, remappé sur les rôles M3 (rétrocompatibilité)
    ========================================================================== */
@@ -111,7 +259,6 @@
 
   --ev-c-black: var(--green-20);
   --ev-c-black-soft: var(--green-30);
-  --ev-c-black-mute: var(--green-40);
 
   --ev-c-gray-1: var(--green-50);
   --ev-c-gray-2: var(--green-40);
@@ -121,22 +268,13 @@
   --ev-c-text-2: rgba(190, 237, 215, 0.6);
   --ev-c-text-3: rgba(190, 237, 215, 0.38);
 
-  --ev-button-alt-border: transparent;
-  --ev-button-alt-text: var(--ev-c-text-1);
-  --ev-button-alt-bg: var(--ev-c-gray-3);
-  --ev-button-alt-hover-border: transparent;
-  --ev-button-alt-hover-text: var(--ev-c-text-1);
-  --ev-button-alt-hover-bg: var(--ev-c-gray-2);
-
   --color-accent: var(--md-sys-color-primary-container);
   --color-accent-hover: var(--md-sys-color-tertiary-container);
-  --color-accent-soft: var(--md-sys-color-primary-container);
 }
 
 :root {
   --color-background: var(--md-sys-color-background);
   --color-background-soft: var(--md-sys-color-surface);
-  --color-background-mute: var(--md-sys-color-surface-variant);
 
   --color-text: var(--md-sys-color-on-surface);
 }

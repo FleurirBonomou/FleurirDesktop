@@ -16,7 +16,7 @@ function Home(): React.JSX.Element {
   return (
     <div className="radial-bg">
       <div className="home-center">
-        <button type="button" className="home-start-btn" onClick={() => navigate('/session')}>
+        <button className="btn btn--text home-start-btn" onClick={() => navigate('/session')}>
           Questions !
         </button>
       </div>
