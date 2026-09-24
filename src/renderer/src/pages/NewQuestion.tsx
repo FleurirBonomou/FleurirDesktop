@@ -31,9 +31,9 @@ const TRUE_FALSE_VALUES: Partial<Record<QuestionType, { answer: string; history:
 /** Un type qui exige la saisie d'une réponse et d'un historique (tout sauf Vrai/Faux). */
 const requiresAnswer = (type: QuestionType): boolean => !QUESTION_TYPES_WITHOUT_ANSWER.has(type)
 
-/** Vrai si le texte contient du contenu riche (LaTeX, code ou image) → aperçu live. */
+/** Vrai si le texte contient du contenu riche (LaTeX, code — blocs ou inline — ou image) → aperçu live. */
 const hasRichContent = (text: string): boolean =>
-  text.includes('$') || text.includes('```') || text.includes('![')
+  text.includes('$') || text.includes('`') || text.includes('![')
 
 // ===========================================================================
 // Sous-composants & helpers
