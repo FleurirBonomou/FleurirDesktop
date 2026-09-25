@@ -89,11 +89,11 @@
 
 /* Rôles sémantiques — schéma clair (mêmes rôles, autres tons) */
 [data-theme='light'] {
-  --md-sys-color-primary: var(--green-40);
+  --md-sys-color-primary: var(--green-30);
   --md-sys-color-on-primary: var(--green-100);
   --md-sys-color-primary-container: var(--green-90);
   --md-sys-color-on-primary-container: var(--green-10);
-  --md-sys-color-secondary: var(--green-40);
+  --md-sys-color-secondary: var(--green-30);
   --md-sys-color-on-secondary: var(--green-100);
   --md-sys-color-secondary-container: var(--green-90);
   --md-sys-color-on-secondary-container: var(--green-10);
@@ -121,8 +121,14 @@
 
   /* Texte sur background */
   --text-bg: var(--green-10);
-  --text-bg-strong: var(--green-0)
+  --text-bg-strong: var(--green-0);
 
+  /* Gradient radial de la page session + accueil (équivalent du sombre) :
+     partie la plus brillante en BAS, haut assourdi ; couleurs un poil moins
+     lumineuses qu'un blanc pur (fond surtout blanc, pointe de vert). */
+  --radial-center: #c0e4cf;
+  --radial-mid: #eef7f1;
+  --radial-edge: #fbfdfc;
 }
 
 /* ==========================================================================
@@ -277,6 +283,26 @@
   --color-background-soft: var(--md-sys-color-surface);
 
   --color-text: var(--md-sys-color-on-surface);
+}
+
+/* Legacy electron-vite — MAPPE LE CLAIR : ce bloc arrive APRÈS le bloc `:root`
+   legacy (même spécificité → le dernier gagne). Sans lui, les textes du sombre
+   resteraient blanc translucide, invisibles sur fond clair. */
+[data-theme='light'] {
+  --ev-c-text-1: rgba(0, 33, 22, 0.87);
+  --ev-c-text-2: rgba(0, 33, 22, 0.62);
+  --ev-c-text-3: rgba(0, 33, 22, 0.42);
+  /* Le "noir" sert de couleur de texte (cartes, types de question, dropdown
+     sélectionné) → on le garde vert sombre. "black-soft" est le FOND du menu
+     déroulant Cours → devient un panneau clair pour un texte sombre lisible. */
+  --ev-c-black: var(--green-20);
+  --ev-c-black-soft: var(--green-90);
+  --ev-c-white: var(--green-10);
+  --ev-c-white-soft: var(--green-90);
+  --ev-c-white-mute: var(--green-90);
+  --ev-c-gray-1: var(--green-50);
+  --ev-c-gray-2: var(--green-60);
+  --ev-c-gray-3: var(--green-80);
 }
 
 *,

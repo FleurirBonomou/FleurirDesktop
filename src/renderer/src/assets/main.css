@@ -921,20 +921,22 @@ nav a {
   flex: none;
   width: 220px;
   padding: var(--spacing-3) var(--spacing-4);
-  border: 1px solid var(--ev-c-white-soft);
+  border: 1px solid var(--md-sys-color-primary);
   border-radius: var(--radius-sm);
-  background-color: var(--ev-c-white-soft);
-  color: var(--ev-c-black);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font-size: var(--font-size-md);
   font-weight: 600;
   cursor: pointer;
   transition:
     opacity 300ms ease,
+    background-color 150ms,
     border-color 150ms;
 }
 
 .answer-panel button:hover {
-  border-color: var(--ev-c-white);
+  background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
+  border-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
 }
 
 .answer-panel button:disabled {
@@ -1239,6 +1241,12 @@ nav a {
   min-width: 0;      /* ← critique */
   overflow-y: auto;  /* scroll interne du panneau si contenu long */
   padding: var(--spacing-5);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
 }
 
 .switch-row {
