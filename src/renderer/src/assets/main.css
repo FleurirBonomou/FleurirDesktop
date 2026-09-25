@@ -455,6 +455,18 @@ nav a {
   overflow-wrap: break-word;
 }
 
+/* Thème clair : --ev-c-bg-2 n'existe pas → le fallback sombre #16181d
+   restait, avec un texte hérité sombre → invisible. Fond clair ici. */
+[data-theme='light'] .code-inline {
+  background-color: var(--ev-c-white-mute);
+}
+
+/* Thème clair : les blocs de code gardent un fond sombre → on force un texte
+   de base clair (les jetons Prism ont déjà leurs couleurs claires). */
+[data-theme='light'] .code-block code {
+  color: var(--green-90);
+}
+
 /* Image dans le contenu (![alt](url)). */
 .content-image {
   display: block;
